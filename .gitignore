@@ -1,0 +1,6 @@
+bin
+src/lwjgl3
+src/mesh
+src/obj
+src/shaders
+src/tex
