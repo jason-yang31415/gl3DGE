@@ -188,6 +188,8 @@ public class DefaultGameObjectInit extends GameObjectInit {
 			spec.bind();
 		if (bump != null)
 			bump.bind();
+		if (emission != null)
+			emission.bind();
 	}
 	
 	public void unbindSamplerMaps(){
@@ -197,6 +199,8 @@ public class DefaultGameObjectInit extends GameObjectInit {
 			texture.unbind();
 		if (bump != null)
 			bump.unbind();
+		if (emission != null)
+			emission.unbind();
 	}
 	
 	public void draw(){
