@@ -8,16 +8,22 @@ in Material {
 	float specularity;
 } mat_in;
 
+in Light {
+	vec3 light_cameraspace;
+	vec3 color;
+	float power;
+} light_in;
+
 in vec3 N;
 in vec3 v;
 in vec3 position_worldspace;
 //in vec3 normal_cameraspace;
-in vec3 light_cameraspace;
+//in vec3 light_cameraspace;
 in vec3 eyeDirection_cameraspace;
 
 out vec4 fragColor;
 
-uniform vec3 light;
+uniform vec3 lightPos;
 
 uniform int enableTex;
 uniform int enableSpec;
@@ -30,7 +36,6 @@ uniform sampler2D emission;
 
 void main() {
 	vec3 lightColor = vec3(1, 1, 1);
-	float lightPower = 50;
 	
 	vec3 color;
 	if (clamp(enableTex, 0, 1) == 0)
@@ -41,7 +46,7 @@ void main() {
 	vec3 Iamb = vec3(0.1, 0.1, 0.1) * color;
 	//vec3 Iamb = mat_in.ambient;
 	
-	float distance = length(light - position_worldspace);
+	float distance = length(lightPos - position_worldspace);
 	
 	vec3 V;
 	if (clamp(enableBump, 0, 1) == 0)
@@ -49,7 +54,7 @@ void main() {
 	else
 		V = v + texture(bump, mat_in.texCoord).x * N;
 	
-	vec3 L = normalize(light_cameraspace - V);
+	vec3 L = normalize(light_in.light_cameraspace - V);
 	float cosTheta = clamp(dot(N, L), 0, 1);
 	
 	float roughness;
@@ -73,7 +78,7 @@ void main() {
 	
 	// custom specularity model
 	float specfunc = pow((cosAlpha * roughness + 1) / 2, 1);
-	vec3 Ispec = mat_in.specular * lightColor * lightPower * pow(cosAlpha, 5) / (distance * distance);
+	vec3 Ispec = mat_in.specular * light_in.color * light_in.power * pow(cosAlpha, 5) / (distance * distance);
 	Ispec = clamp(Ispec, 0, 1);
 	
 	// emission

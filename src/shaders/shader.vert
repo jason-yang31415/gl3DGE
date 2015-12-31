@@ -13,14 +13,21 @@ out Material {
 	float specularity;
 } mat_out;
 
+out Light {
+	vec3 light_cameraspace;
+	vec3 color;
+	float power;
+} light_out;
+
 out vec3 N;
 out vec3 v;
 
 out vec3 position_worldspace;
-out vec3 light_cameraspace;
 out vec3 eyeDirection_cameraspace;
 
-uniform vec3 light;
+uniform vec3 lightPos;
+uniform vec3 lightColor;
+uniform float lightPower;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -39,10 +46,13 @@ void main() {
 	vec3 position_cameraspace = (view * model * vec4(position, 1)).xyz;
 	eyeDirection_cameraspace = vec3(0, 0, 0) - position_cameraspace;
 	
-	vec4 lightPositionVec4 = vec4(light, 1);
+	vec4 lightPositionVec4 = vec4(lightPos, 1);
 	
-	vec3 lightPosition_cameraspace = (view * vec4(light, 1)).xyz;
-	light_cameraspace = lightPosition_cameraspace + eyeDirection_cameraspace;
+	vec3 lightPosition_cameraspace = (view * vec4(lightPos, 1)).xyz;
+	light_out.light_cameraspace = lightPosition_cameraspace + eyeDirection_cameraspace;
+	
+	light_out.color = lightColor;
+	light_out.power = lightPower;
 	
 	mat4 mvp = projection * view * model;
 	gl_Position = mvp * vec4(position, 1.0);
