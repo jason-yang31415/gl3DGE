@@ -20,10 +20,8 @@ import util.Vector3f;
 
 public class OBJLoader {
 	
-	public static void loadGameObjectData(DefaultGameObjectInit dgoi, String objPath, String vertexPath, String fragmentPath) 
+	public static void loadGameObjectData(DefaultGameObjectInit dgoi, String objPath, String vertexPath, String fragmentPath, boolean smooth) 
 			throws FileNotFoundException, IOException{
-		
-		boolean smooth = false;
 		
 		Mesh mesh = new Mesh();
 		

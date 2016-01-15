@@ -44,6 +44,7 @@ public class DefaultGameObjectInit extends GameObjectInit {
 		String fragmentPath = "fragment";
 		String obj = "";
 		float radius = 1.0f;
+		boolean smooth = false;
 		while ((line = reader.readLine()) != null){
 			line = line.replace(" ", "");
 			String[] s = line.split(":");
@@ -66,13 +67,15 @@ public class DefaultGameObjectInit extends GameObjectInit {
 				bump = BumpMap.load(s[1]);
 			else if (s[0].equals("emission"))
 				emission = EmissionMap.load(s[1]);
+			else if (s[0].equals("smooth"))
+				smooth = Boolean.parseBoolean(s[1]);
 			else if (s[0].equals("radius"))
 				radius = Float.parseFloat(s[1]);
 		}
 		reader.close();
 		
 		if (obj != ""){
-			OBJLoader.loadGameObjectData(this, obj, vertexPath, fragmentPath);
+			OBJLoader.loadGameObjectData(this, obj, vertexPath, fragmentPath, smooth);
 		}
 		else
 			throw new FileNotFoundException("Could not find obj file");
