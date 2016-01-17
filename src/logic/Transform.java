@@ -2,13 +2,12 @@ package logic;
 
 import util.Matrix4f;
 import util.Vector3f;
-import util.Vector4f;
 
 public abstract class Transform {
 	
 	public static enum Type {
 		T2D,
-		T3D, // UNTESTED AS CAMERA: DO NOT USE AS CAMERA TYPE, GET VIEW MATRIX IS UNTESTED
+		T3D,
 		TORBIT
 	}
 	Type type = Type.T3D;
@@ -53,16 +52,16 @@ public abstract class Transform {
 		float dx = 0;
 		float dy = 0;
 		float dz = 0;
-		dx += z * -rotate.m02;
-		dy += z * -rotate.m12;
-		dz += z * rotate.m22;
+		dx -= z * rotate.m02;
+		dy -= z * rotate.m12;
+		dz -= z * rotate.m22;
 		
-		dx += x * -rotate.m00;
+		dx += x * rotate.m00;
 		dy += x * rotate.m10;
 		dz += x * rotate.m20;
 		switch (type){
 		case T2D:
-			dy += -y;
+			dy += y;
 			break;
 		case T3D:
 			// ???
@@ -82,12 +81,12 @@ public abstract class Transform {
 		case T2D:
 			if (x == 1 && y == 0){
 				if (Math.abs(ry + r) < 90){
-					rotX = rotX.multiply(Matrix4f.rotate(r, 1, 0, 0));
+					rotX = rotX.multiply(Matrix4f.rotate(-r, 1, 0, 0));
 					ry += r;
 				}
 			}
 			else if (x == 0 && y == 1){
-				rotY = rotY.multiply(Matrix4f.rotate(r, 0, 1, 0));
+				rotY = rotY.multiply(Matrix4f.rotate(-r, 0, 1, 0));
 			}
 			else
 				System.out.println("Transform2D cannot handle transforms in both x and y axes simultaneously");
@@ -108,12 +107,9 @@ public abstract class Transform {
 	}
 	
 	public Vector3f getPos(){
-		/*float x = matrix.m03;
-		float y = matrix.m13;
-		float z = matrix.m23;*/
-		float x = -getMatrix().m03;
-		float y = -getMatrix().m13;
-		float z = -getMatrix().m23;
+		float x = getMatrix().m03;
+		float y = getMatrix().m13;
+		float z = getMatrix().m23;
 		return new Vector3f(x, y, z);
 	}
 	
@@ -128,16 +124,12 @@ public abstract class Transform {
 		default:
 			return matrix;
 		}*/
-		Matrix4f test = translate.multiply(rotate);
-		//Vector4f v = test.multiply(new Vector4f(0, 0, 0, 1));
-		//System.out.println(v.x + " " + v.y + " " + v.z + " " + v.w);
-		//System.out.println(test.m03 + " " + test.m13 + " " + test.m23);
-		//System.out.println(Math.toDegrees(Math.acos(test.m00)));
-		return translate.multiply(rotate);
+		matrix = translate.multiply(rotate);
+		return matrix;
 	}
 	
 	public Matrix4f getLookAt(){
-		Matrix4f view = new Matrix4f();
+		/*Matrix4f view = new Matrix4f();
 		switch (type){
 		case T2D:
 			view = rotX.multiply(rotY).multiply(translate);
@@ -147,14 +139,17 @@ public abstract class Transform {
 			break;
 		case TORBIT:
 			break;
-		}
+		}*/
 		
-		/*System.out.println();
+		return getMatrix().invert();
+	}
+	
+	// DEBUG
+	
+	public void print(){
 		System.out.println(			rotate.m00 + "			" + rotate.m01 + "			" + rotate.m02
 						+ "\n" +	rotate.m10 + "			" + rotate.m11 + "			" + rotate.m12
-						+ "\n" +	rotate.m20 + "			" + rotate.m21 + "			" + rotate.m22);*/
-		
-		return view;
+						+ "\n" +	rotate.m20 + "			" + rotate.m21 + "			" + rotate.m22);
 	}
 	
 }
