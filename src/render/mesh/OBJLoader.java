@@ -1,8 +1,5 @@
 package render.mesh;
 
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,13 +11,12 @@ import java.util.ArrayList;
 import org.lwjgl.BufferUtils;
 
 import render.DefaultGameObjectInit;
-import render.Shader;
 import util.Vector2f;
 import util.Vector3f;
 
 public class OBJLoader {
 	
-	public static void loadGameObjectData(DefaultGameObjectInit dgoi, String objPath, String vertexPath, String fragmentPath, boolean smooth) 
+	public static void loadGameObjectData(DefaultGameObjectInit dgoi, String objPath, boolean smooth) 
 			throws FileNotFoundException, IOException{
 		
 		Mesh mesh = new Mesh();
@@ -125,14 +121,6 @@ public class OBJLoader {
 			verts_float.add(v.tex.y);
 		}
 		
-		String vertexSource = readFile(Resource.SHADER_DIR + vertexPath);
-		
-		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
-		
-		String fragmentSource = readFile(Resource.SHADER_DIR + fragmentPath);
-		
-		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
-		
 		float[] vertArray = new float[verts_float.size()];
 		for (int n = 0; n < verts_float.size(); n++){
 			vertArray[n] = verts_float.get(n);
@@ -148,8 +136,6 @@ public class OBJLoader {
 		
 		dgoi.loadVertices(vertices);
 		dgoi.loadIndices(indexArray);
-		dgoi.loadVertexShader(vertexShader);
-		dgoi.loadFragmentShader(fragmentShader);
 		//return new GameObject(vertices, vertexShader, fragmentShader, indexArray, tex, spec);
 	}
 	
@@ -180,18 +166,6 @@ public class OBJLoader {
 		if (x < 0.01 && y < 0.01 && z < 0.01)
 			return true;
 		return false;
-	}
-	
-	public static String readFile(String path) throws IOException{
-		BufferedReader reader = new BufferedReader(new InputStreamReader(OBJLoader.class.getResourceAsStream(path)));
-		String line;
-		StringBuilder sb = new StringBuilder();
-		while ((line = reader.readLine()) != null){
-			sb.append(line);
-			sb.append("\n");
-		}
-		reader.close();
-		return sb.toString();
 	}
 	
 }

@@ -6,6 +6,7 @@ public class Resource {
 	public static String OBJ_DIR = "/";
 	public static String TEX_DIR = "/";
 	public static String SHADER_DIR = "/";
+	public static String DEFAULT_SHADER_DIR = "/shaders/";
 	
 	public static void setGameObjectDir(String path){
 		GAMEOBJECT_DIR = path;

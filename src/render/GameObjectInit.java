@@ -17,6 +17,14 @@ public abstract class GameObjectInit {
 	Shader fragmentShader;
 	ShaderProgram shader;
 	
+	String vertexPath;
+	String fragmentPath;
+	
+	public GameObjectInit(String vertexPath, String fragmentPath){
+		this.vertexPath = vertexPath;
+		this.fragmentPath = fragmentPath;
+	}
+	
 	public abstract void load(String path) throws FileNotFoundException, IOException;
 	
 	public void loadVertices(FloatBuffer vertices){

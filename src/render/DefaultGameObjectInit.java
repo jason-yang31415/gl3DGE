@@ -9,7 +9,10 @@ import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import game.GameObject;
+import io.FileLoader;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -35,23 +38,29 @@ public class DefaultGameObjectInit extends GameObjectInit {
 	BumpMap bump;
 	EmissionMap emission;
 	
+	public DefaultGameObjectInit(){
+		super("shader.vert", "shader.frag");
+	}
+	
 	@Override
 	public void load(String path) throws FileNotFoundException, IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(GameObject.class.getResourceAsStream(Resource.GAMEOBJECT_DIR + path)));
 		String line;
 		
-		String vertexPath = "vertex";
-		String fragmentPath = "fragment";
 		String obj = "";
 		float radius = 1.0f;
 		boolean smooth = false;
 		while ((line = reader.readLine()) != null){
 			line = line.replace(" ", "");
 			String[] s = line.split(":");
-			if (s[0].equals("vertex"))
-				vertexPath = s[1];
-			else if (s[0].equals("fragment"))
-				fragmentPath = s[1];
+			if (s[0].equals("vertex")){
+				if (!s[1].equals(vertexPath))
+					throw new RuntimeException("Shader specified in " + path + " is not compatible with this shader");
+			}
+			else if (s[0].equals("fragment")){
+				if (!s[1].equals(fragmentPath))
+					throw new RuntimeException("Shader specified in " + path + " is not compatible with this shader");
+			}
 			else if (s[0].equals("obj"))
 				obj = s[1];
 			else if (s[0].equals("texture"))
@@ -75,10 +84,18 @@ public class DefaultGameObjectInit extends GameObjectInit {
 		reader.close();
 		
 		if (obj != ""){
-			OBJLoader.loadGameObjectData(this, obj, vertexPath, fragmentPath, smooth);
+			OBJLoader.loadGameObjectData(this, obj, smooth);
 		}
 		else
 			throw new FileNotFoundException("Could not find obj file");
+		
+		String vertexSource = FileLoader.loadFile(Resource.DEFAULT_SHADER_DIR + vertexPath);
+		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
+		String fragmentSource = FileLoader.loadFile(Resource.DEFAULT_SHADER_DIR + fragmentPath);
+		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
+
+		loadVertexShader(vertexShader);
+		loadFragmentShader(fragmentShader);
 	}
 	
 	public void loadIndices(int[] indices){

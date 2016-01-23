@@ -1,7 +1,6 @@
 package render;
 
 import logic.Transform;
-// fix!!!!!
 
 public abstract class Drawable extends Transform {
 

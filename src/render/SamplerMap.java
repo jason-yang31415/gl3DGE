@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
+import io.ImageLoader;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -14,8 +15,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
-
-import render.mesh.ImageLoader;
 
 public abstract class SamplerMap {
 
