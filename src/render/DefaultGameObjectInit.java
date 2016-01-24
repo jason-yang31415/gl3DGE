@@ -11,13 +11,10 @@ import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import game.GameObject;
 import io.FileLoader;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
@@ -38,62 +35,63 @@ public class DefaultGameObjectInit extends GameObjectInit {
 	BumpMap bump;
 	EmissionMap emission;
 	
+	String obj;
+	boolean smooth;
+	
 	public DefaultGameObjectInit(){
 		super("shader.vert", "shader.frag");
 	}
 	
 	@Override
-	public void load(String path) throws FileNotFoundException, IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(GameObject.class.getResourceAsStream(Resource.GAMEOBJECT_DIR + path)));
-		String line;
-		
-		String obj = "";
-		float radius = 1.0f;
-		boolean smooth = false;
-		while ((line = reader.readLine()) != null){
-			line = line.replace(" ", "");
-			String[] s = line.split(":");
-			if (s[0].equals("vertex")){
-				if (!s[1].equals(vertexPath))
-					throw new RuntimeException("Shader specified in " + path + " is not compatible with this shader");
+	public void load(String param, String value) {
+		switch (param){
+		case "vertex":
+			if (!value.equals(vertexPath))
+				throw new RuntimeException("Shader specified in this file is not compatible with this shader");
+			break;
+		case "fragment":
+			if (!value.equals(fragmentPath))
+				throw new RuntimeException("Shader specified in this file is not compatible with this shader");
+			break;
+		case "obj":
+			obj = value;
+			break;
+		case "texture":
+			texture = TextureMap.load(value);
+			break;
+		case "specularity":
+			try {
+				specularity = Float.parseFloat(value);
+			} catch (NumberFormatException e){
+				spec = SpecularityMap.load(value);
 			}
-			else if (s[0].equals("fragment")){
-				if (!s[1].equals(fragmentPath))
-					throw new RuntimeException("Shader specified in " + path + " is not compatible with this shader");
-			}
-			else if (s[0].equals("obj"))
-				obj = s[1];
-			else if (s[0].equals("texture"))
-				texture = TextureMap.load(s[1]);
-			else if (s[0].equals("specularity")){
-				try {
-					specularity = Float.parseFloat(s[1]);
-				} catch (NumberFormatException e){
-					spec = SpecularityMap.load(s[1]);
-				}
-			}
-			else if (s[0].equals("bump"))
-				bump = BumpMap.load(s[1]);
-			else if (s[0].equals("emission"))
-				emission = EmissionMap.load(s[1]);
-			else if (s[0].equals("smooth"))
-				smooth = Boolean.parseBoolean(s[1]);
-			else if (s[0].equals("radius"))
-				radius = Float.parseFloat(s[1]);
+			break;
+		case "bump":
+			bump = BumpMap.load(value);
+			break;
+		case "emission":
+			emission = EmissionMap.load(value);
+			break;
+		case "smooth":
+			smooth = Boolean.parseBoolean(value);
+			break;
 		}
-		reader.close();
-		
+	}
+	
+	public void loadObjectData() throws IOException, FileNotFoundException {
 		if (obj != ""){
 			OBJLoader.loadGameObjectData(this, obj, smooth);
 		}
 		else
 			throw new FileNotFoundException("Could not find obj file");
-		
+	}
+	
+	public void loadShaders() throws IOException{
 		String vertexSource = FileLoader.loadFile(Resource.DEFAULT_SHADER_DIR + vertexPath);
 		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
 		String fragmentSource = FileLoader.loadFile(Resource.DEFAULT_SHADER_DIR + fragmentPath);
 		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
-
+		
 		loadVertexShader(vertexShader);
 		loadFragmentShader(fragmentShader);
 	}

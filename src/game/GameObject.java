@@ -1,10 +1,13 @@
 package game;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import logic.Transform;
 import render.Drawable;
 import render.GameObjectInit;
+import render.mesh.Resource;
 import util.Vector3f;
 
 public class GameObject extends Drawable {
@@ -16,42 +19,32 @@ public class GameObject extends Drawable {
 	BoundingSphere bound;
 	
 	public static GameObject loadGameObject(String path, GameObjectInit goi) throws IOException {
-		/*BufferedReader reader = new BufferedReader(new InputStreamReader(GameObject.class.getResourceAsStream("/mesh/" + path)));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(GameObject.class.getResourceAsStream(Resource.GAMEOBJECT_DIR + path)));
 		String line;
 		
-		String vertexPath = "vertex";
-		String fragmentPath = "fragment";
-		String obj = "";
-		TextureMap tex = null;
 		float radius = 1.0f;
 		while ((line = reader.readLine()) != null){
 			line = line.replace(" ", "");
 			String[] s = line.split(":");
-			if (s[0].equals("vertex"))
-				vertexPath = s[1];
-			else if (s[0].equals("fragment"))
-				fragmentPath = s[1];
-			else if (s[0].equals("obj"))
-				obj = s[1];
-			else if (s[0].equals("texture"))
-				tex = TextureMap.load(s[1]);
-			else if (s[0].equals("radius"))
-				radius = Float.parseFloat(s[1]);
+			
+			String param = s[0];
+			String value = s[1];
+			switch (param){
+			case "radius":
+				radius = Float.parseFloat(value);
+				break;
+			default:
+				goi.load(param, value);
+				break;
+			}
 		}
 		reader.close();
 		
-		// TEMP
-		SpecularityMap spec = SpecularityMap.load("/tex/brick_spec.bmp");
+		goi.loadObjectData();
+		goi.loadShaders();
 		
-		if (obj != ""){
-			GameObject go = OBJLoader.loadGameObject(obj, vertexPath, fragmentPath, tex, spec);
-			go.getBound().setSize(radius);
-			return go;
-		}
-		else {
-			throw new FileNotFoundException("Could not find obj file");
-		}*/
-		goi.load(path);
+		goi.check();
+		
 		return new GameObject(goi);
 	}
 	
