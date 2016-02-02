@@ -11,7 +11,12 @@ gl3DGE is supports:
 * Texture maps
 * Specularity maps
 * Emission maps
-* Smooth shading
-* EBO
+* Smooth shading / EBO
 * Per-fragment Phong shading
+* Custom shaders
 * 3D transformations
+
+In progress
+* Particle systems
+* Normal maps
+* Modular framework design
