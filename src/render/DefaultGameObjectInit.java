@@ -79,9 +79,8 @@ public class DefaultGameObjectInit extends GameObjectInit {
 	}
 	
 	public void loadObjectData() throws IOException, FileNotFoundException {
-		if (obj != ""){
+		if (obj != "")
 			OBJLoader.loadGameObjectData(this, obj, smooth);
-		}
 		else
 			throw new FileNotFoundException("Could not find obj file");
 	}
@@ -149,21 +148,6 @@ public class DefaultGameObjectInit extends GameObjectInit {
 		shader.enableVertexAttribArray(texAttrib);
 		shader.vertexAttribPointer(texAttrib, 2, stride * floatSize, 12 * floatSize);
 		
-		Matrix4f model = new Matrix4f();
-		shader.setUniformMat4f("model", model);
-		Matrix4f view = new Matrix4f();
-		shader.setUniformMat4f("view", view);
-
-		//float ratio = LWJGL3.WIDTH / LWJGL3.HEIGHT;
-		float ratio = 1;
-		Matrix4f projection = Matrix4f.perspective(90, ratio, 0.01f, 100);
-		//Matrix4f projection = Matrix4f.orthographic(-ratio, ratio, -1f, 1f, -1f, 1f);
-		shader.setUniformMat4f("projection", projection);
-		
-		//Vector3f light = new Vector3f(0, 0, 0);
-		//Matrix4f projection = Matrix4f.orthographic(-ratio, ratio, -1f, 1f, -1f, 1f);
-		//shader.setUniform3f("light", light.x,light.y, light.z);
-		
 		shader.setUniform1i("tex", SamplerMap.TEX_DEFAULT);
 		
 		int enableTex = ((texture != null) ? 1 : 0);
@@ -189,6 +173,14 @@ public class DefaultGameObjectInit extends GameObjectInit {
 		shader.unbind();
 		vbo.unbind(GL_ARRAY_BUFFER);
 		vao.unbind();
+	}
+	
+	public void setMVP(Matrix4f model, Matrix4f view, Matrix4f projection){
+		shader.bind();
+		shader.setUniformMat4f("model", model);
+		shader.setUniformMat4f("view", view);
+		shader.setUniformMat4f("projection", projection);
+		shader.unbind();
 	}
 	
 	public void update(Scene scene, Drawable d){

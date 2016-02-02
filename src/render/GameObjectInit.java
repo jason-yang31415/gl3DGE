@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import util.Matrix4f;
+
 public abstract class GameObjectInit {
 
 	int count;
@@ -51,6 +53,8 @@ public abstract class GameObjectInit {
 	public void loadFragmentShader(Shader fragmentShader){
 		this.fragmentShader = fragmentShader;
 	}
+	
+	public abstract void setMVP(Matrix4f model, Matrix4f view, Matrix4f projection);
 	
 	public abstract void init();
 	

@@ -15,8 +15,8 @@ public abstract class Transform {
 	protected Matrix4f matrix;
 	
 	// TESTING
-	Matrix4f translate = new Matrix4f();
-	Matrix4f rotate = new Matrix4f();
+	protected Matrix4f translate = new Matrix4f();
+	protected Matrix4f rotate = new Matrix4f();
 	
 	// 2D
 	float ry;

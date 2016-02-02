@@ -8,6 +8,7 @@ import logic.Transform;
 import render.Drawable;
 import render.GameObjectInit;
 import render.mesh.Resource;
+import util.Matrix4f;
 import util.Vector3f;
 
 public class GameObject extends Drawable {
@@ -72,6 +73,13 @@ public class GameObject extends Drawable {
 	
 	public GameObject(GameObjectInit goi){
 		super(goi);
+		
+		// MVP
+		float ratio = 1;
+		Matrix4f projection = Matrix4f.perspective(90, ratio, 0.01f, 100);
+		//Matrix4f projection = Matrix4f.orthographic(-ratio, ratio, -1f, 1f, -1f, 1f);
+		goi.setMVP(new Matrix4f(), new Matrix4f(), projection);
+		
 		bound = new BoundingSphere(this, 1);
 		v = new Vector3f();
 	}
