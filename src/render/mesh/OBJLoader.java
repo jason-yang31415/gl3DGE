@@ -5,28 +5,32 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.lwjgl.BufferUtils;
-
-import render.DefaultGameObjectInit;
 import util.Vector2f;
 import util.Vector3f;
 
 public class OBJLoader {
 	
-	public static void loadGameObjectData(DefaultGameObjectInit dgoi, String objPath, boolean smooth) 
+	public static void loadGameObjectData(Mesh mesh, String objPath, boolean smooth) 
 			throws FileNotFoundException, IOException{
 		
-		Mesh mesh = new Mesh();
+		Map<String, Material> materials = new HashMap<String, Material>();
 		
-		ArrayList<Vertex> verts = new ArrayList<Vertex>();
+		ArrayList<Vertex> vertex_cache = new ArrayList<Vertex>();
+		ArrayList<Vector2f> tex_cache = new ArrayList<Vector2f>();
+		ArrayList<Vector3f> normal_cache = new ArrayList<Vector3f>();
+		
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+		
+		//ArrayList<Vertex> verts_delete = new ArrayList<Vertex>();
 		ArrayList<Integer> indices = new ArrayList<Integer>();
 		
 		//FloatBuffer vertices = BufferUtils.createFloatBuffer(2048);
-		ArrayList<Float> verts_float = new ArrayList<Float>();
-		int count = 0;
+		//ArrayList<Float> verts_float = new ArrayList<Float>();
+		//int count = 0;
 		
 		InputStream is = OBJLoader.class.getResourceAsStream(Resource.OBJ_DIR + objPath);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -38,73 +42,71 @@ public class OBJLoader {
 			//parse
 			if (line.startsWith("mtllib")){
 				String file = line.split(" ")[1];
-				mesh.loadMat(Resource.OBJ_DIR + file);
+				//mesh.loadMat(Resource.OBJ_DIR + file);
+				materials = loadMaterials(Resource.OBJ_DIR + file);
 			}
 			if (line.startsWith("v ")){
 				float x = Float.valueOf(line.split(" ")[1]);
 				float y = Float.valueOf(line.split(" ")[2]);
 				float z = Float.valueOf(line.split(" ")[3]);
-				//m.vertices.add(new Vector3f(x, y, z));
-				mesh.verts.add(new Vertex(x, y, z));
+				//mesh.verts.add(new Vertex(x, y, z));
+				vertex_cache.add(new Vertex(x, y, z));
 			}
 			else if (line.startsWith("vt ")){
 				float x = Float.valueOf(line.split(" ")[1]);
 				float y = Float.valueOf(line.split(" ")[2]);
-				mesh.texcoords.add(new TexCoord(x, y));
+				//mesh.texcoords.add(new TexCoord(x, y));
+				tex_cache.add(new Vector2f(x, y));
 			}
 			else if (line.startsWith("vn ")){
 				float x = Float.valueOf(line.split(" ")[1]);
 				float y = Float.valueOf(line.split(" ")[2]);
 				float z = Float.valueOf(line.split(" ")[3]);
-				mesh.normals.add(new Vector3f(x, y, z));
+				//mesh.normals.add(new Vector3f(x, y, z));
+				normal_cache.add(new Vector3f(x, y, z));
 			}
 			else if (line.startsWith("usemtl ")){
 				String name = String.valueOf(line.split(" ")[1]);
-				mtl = mesh.mat.get(name);
+				mtl = materials.get(name);
 				//System.out.println(name);
 			}
 			else if (line.startsWith("f ")){
-				/*Vector3f vertexIndices = new Vector3f(Float.valueOf(line.split(" ")[1].split("/")[0]),
-						Float.valueOf(line.split(" ")[2].split("/")[0]),
-						Float.valueOf(line.split(" ")[3].split("/")[0]));
-				Vector3f normalIndices = new Vector3f(Float.valueOf(line.split(" ")[1].split("/")[2]),
-						Float.valueOf(line.split(" ")[2].split("/")[2]),
-						Float.valueOf(line.split(" ")[3].split("/")[2]));*/
-				//m.faces.add(new Face(vertexIndices, normalIndices, mtl));
 				String[][] face = new String[3][3];
 				face[0] = line.split(" ")[1].split("/");
 				face[1] = line.split(" ")[2].split("/");
 				face[2] = line.split(" ")[3].split("/");
 				
 				for (String[] j : face){
-					Vertex v = mesh.verts.get(Integer.parseInt(j[0]) - 1);
-					TexCoord t = new TexCoord(0, 0);
+					Vertex v = vertex_cache.get(Integer.parseInt(j[0]) - 1);
+					Vector2f tex = new Vector2f(0, 0);
 					if (!j[1].equals(""))
-						t = mesh.texcoords.get(Integer.parseInt(j[1]) - 1);
-					Vector3f normal = mesh.normals.get(Integer.parseInt(j[2]) - 1);
+						tex = tex_cache.get(Integer.parseInt(j[1]) - 1);
+					Vector3f normal = normal_cache.get(Integer.parseInt(j[2]) - 1);
 					
-					Vertex vert = new Vertex(v.position.x, v.position.y, v.position.z);
-					vert.ambient = mtl.ambient;
-					vert.diffuse = mtl.diffuse;
-					vert.specular = mtl.specular;
-					vert.normal = new Vector3f(normal.x, normal.y, normal.z);
-					vert.tex = new Vector2f(t.position.x, t.position.y);
+					Vertex vertex = new Vertex(v.getPosition());
+					
+					vertex.setMaterial(mtl);
+					vertex.setNormal(normal);
+					vertex.setTextureCoordinate(tex);
 					
 					if (smooth)
-						checkIndex(verts, indices, vert);
+						checkIndex(vertices, indices, vertex);
 					else {
-						verts.add(vert);
-						indices.add(verts.size() - 1);
+						vertices.add(vertex);
+						indices.add(vertices.size() - 1);
 					}
 				}
 				
-				count += 3;
+				//count += 3;
 			}
 		}
 		reader.close();
 		//return m;
 		
-		for (Vertex v : verts){
+		mesh.loadVertices(vertices);
+		mesh.loadIndices(indices);
+		
+		/*for (Vertex v : vertices){
 			verts_float.add(v.position.x);
 			verts_float.add(v.position.y);
 			verts_float.add(v.position.z);
@@ -135,8 +137,46 @@ public class OBJLoader {
 		}
 		
 		dgoi.loadVertices(vertices);
-		dgoi.loadIndices(indexArray);
+		dgoi.loadIndices(indexArray);*/
 		//return new GameObject(vertices, vertexShader, fragmentShader, indexArray, tex, spec);
+	}
+	
+	public static Map<String, Material> loadMaterials(String file) throws IOException{
+		Map<String, Material> mat = new HashMap<String, Material>();
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(OBJLoader.class.getResourceAsStream(file)));
+		String line;
+		String current = "";
+		while ((line = reader.readLine()) != null){
+			//parse
+			if (line.startsWith("newmtl ")){
+				String name = String.valueOf(line.split(" ")[1]);
+				Material mtl = new Material();
+				mat.put(name, mtl);
+				current = name;
+			}
+			else if (line.startsWith("Ka ")){
+				Material mtl = mat.get(current);
+				mtl.ambient = new Vector3f(Float.valueOf(line.split(" ")[1]), 
+						Float.valueOf(line.split(" ")[2]), 
+						Float.valueOf(line.split(" ")[3]));
+			}
+			else if (line.startsWith("Kd ")){
+				Material mtl = mat.get(current);
+				mtl.diffuse = new Vector3f(Float.valueOf(line.split(" ")[1]), 
+					Float.valueOf(line.split(" ")[2]), 
+					Float.valueOf(line.split(" ")[3]));
+			}
+			else if (line.startsWith("Ks ")){
+				Material mtl = mat.get(current);
+				mtl.specular = new Vector3f(Float.valueOf(line.split(" ")[1]), 
+					Float.valueOf(line.split(" ")[2]), 
+					Float.valueOf(line.split(" ")[3]));
+			}
+		}
+		reader.close();
+		
+		return mat;
 	}
 	
 	public static void checkIndex(ArrayList<Vertex> verts, ArrayList<Integer> i, Vertex vert){
