@@ -19,7 +19,7 @@ public class OBJLoader {
 		
 		Map<String, Material> materials = new HashMap<String, Material>();
 		
-		ArrayList<Vertex> vertex_cache = new ArrayList<Vertex>();
+		ArrayList<Vector3f> vertex_cache = new ArrayList<Vector3f>();
 		ArrayList<Vector2f> tex_cache = new ArrayList<Vector2f>();
 		ArrayList<Vector3f> normal_cache = new ArrayList<Vector3f>();
 		
@@ -50,7 +50,7 @@ public class OBJLoader {
 				float y = Float.valueOf(line.split(" ")[2]);
 				float z = Float.valueOf(line.split(" ")[3]);
 				//mesh.verts.add(new Vertex(x, y, z));
-				vertex_cache.add(new Vertex(x, y, z));
+				vertex_cache.add(new Vector3f(x, y, z));
 			}
 			else if (line.startsWith("vt ")){
 				float x = Float.valueOf(line.split(" ")[1]);
@@ -77,13 +77,13 @@ public class OBJLoader {
 				face[2] = line.split(" ")[3].split("/");
 				
 				for (String[] j : face){
-					Vertex v = vertex_cache.get(Integer.parseInt(j[0]) - 1);
+					Vector3f v = vertex_cache.get(Integer.parseInt(j[0]) - 1);
 					Vector2f tex = new Vector2f(0, 0);
 					if (!j[1].equals(""))
 						tex = tex_cache.get(Integer.parseInt(j[1]) - 1);
 					Vector3f normal = normal_cache.get(Integer.parseInt(j[2]) - 1);
 					
-					Vertex vertex = new Vertex(v.getPosition());
+					Vertex vertex = new Vertex(v);
 					
 					vertex.setMaterial(mtl);
 					vertex.setNormal(normal);
