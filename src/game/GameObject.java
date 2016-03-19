@@ -1,18 +1,21 @@
 package game;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import logic.Transform;
 import render.Drawable;
 import render.GameObjectInit;
+import render.mesh.Mesh;
+import render.mesh.OBJLoader;
 import render.mesh.Resource;
 import util.Matrix4f;
 import util.Vector3f;
 
 public class GameObject extends Drawable {
-
+	
 	// RENDER
 	
 	// LOGIC
@@ -24,6 +27,8 @@ public class GameObject extends Drawable {
 		String line;
 		
 		float radius = 1.0f;
+		String obj = "";
+		boolean smooth = false;
 		while ((line = reader.readLine()) != null){
 			line = line.replace(" ", "");
 			String[] s = line.split(":");
@@ -34,6 +39,12 @@ public class GameObject extends Drawable {
 			case "radius":
 				radius = Float.parseFloat(value);
 				break;
+			case "obj":
+				obj = value;
+				break;
+			case "smooth":
+				smooth = Boolean.parseBoolean(value);
+				break;
 			default:
 				goi.load(param, value);
 				break;
@@ -41,7 +52,15 @@ public class GameObject extends Drawable {
 		}
 		reader.close();
 		
-		goi.loadObjectData();
+		if (!obj.equals("")) {
+			// OBJLoader.loadGameObjectData(this, obj, smooth);
+			Mesh mesh = new Mesh();
+			OBJLoader.loadGameObjectData(mesh, obj, smooth);
+			
+			goi.loadObjectData(mesh);
+		} else
+			throw new FileNotFoundException("Could not find obj file");
+		
 		goi.loadShaders();
 		
 		goi.check();

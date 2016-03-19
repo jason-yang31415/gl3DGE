@@ -1,41 +1,50 @@
 package game;
 
-import java.io.IOException;
-import java.nio.FloatBuffer;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 
-import org.lwjgl.BufferUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import render.Camera;
-import render.DefaultGameObjectInit;
 import render.Drawable;
 import render.GameObjectInit;
 import render.Scene;
+import render.mesh.Material;
+import render.mesh.Mesh;
+import render.mesh.Vertex;
 import util.Matrix4f;
+import util.Vector2f;
 import util.Vector3f;
 import util.Vector4f;
 
 public class Particle extends Drawable {
 
-	public static Particle loadParticle(DefaultGameObjectInit dgoi, Vector3f color) throws IOException{
-		// WORKS ONLY WITH DEFAULT SHADER
-		float[] verts = {1, 1, 0,	 0, 0, -1,	color.x, color.y, color.z,	0, 0, 0,	1, 1,
-						 -1, 1, 0,	 0, 0, -1,	color.x, color.y, color.z,	0, 0, 0,	-1, 1,
-						 -1, -1, 0,	 0, 0, -1,	color.x, color.y, color.z,	0, 0, 0,	-1, -1,
-						 1, -1, 0,	 0, 0, -1,	color.x, color.y, color.z,	0, 0, 0,	1, -1
-						};
-		int[] index = {3, 1, 0, 3, 2, 1};
+	public static Particle loadParticle(GameObjectInit goi, Vector3f color) throws IOException{
+		Mesh mesh = new Mesh();
 		
-		FloatBuffer vertices = BufferUtils.createFloatBuffer(verts.length);
-		vertices.put(verts).flip();
+		ArrayList<Vertex> verts = new ArrayList<Vertex>();
+		Material material = new Material();
+		material.setDiffuse(color);
+		material.setSpecular(new Vector3f(0, 0, 0));
 		
-		dgoi.loadVertices(vertices);
-		dgoi.loadIndices(index);
+		verts.add(new Vertex(new Vector3f(1, 1, 0), new Vector3f(0, 0, -1), material, new Vector2f(1, 1)));
+		verts.add(new Vertex(new Vector3f(-1, 1, 0), new Vector3f(0, 0, -1), material, new Vector2f(-1, 1)));
+		verts.add(new Vertex(new Vector3f(-1, -1, 0), new Vector3f(0, 0, -1), material, new Vector2f(-1, -1)));
+		verts.add(new Vertex(new Vector3f(1, -1, 0), new Vector3f(0, 0, -1), material, new Vector2f(1, -1)));
+		mesh.loadVertices(verts);
 		
-		dgoi.loadShaders();
+		Integer[] index_array = {3, 1, 0, 3, 2, 1};
+		ArrayList<Integer> indices = new ArrayList(Arrays.asList(index_array));
+		mesh.loadIndices(indices);
 		
-		dgoi.check();
+		goi.loadObjectData(mesh);
+		goi.loadShaders();
 		
-		return new Particle(dgoi);
+		goi.check();
+		
+		return new Particle(goi);
 	}
 	
 	public Particle(GameObjectInit goi){
@@ -45,6 +54,11 @@ public class Particle extends Drawable {
 		float ratio = 1;
 		Matrix4f projection = Matrix4f.perspective(90, ratio, 0.01f, 100);
 		goi.setMVP(new Matrix4f(), new Matrix4f(), projection);
+	}
+	
+	@Override
+	public void setBlendFunc(){
+		glBlendFunc(GL_ONE, GL_ONE);
 	}
 	
 	@Override

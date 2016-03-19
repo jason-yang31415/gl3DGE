@@ -1,9 +1,9 @@
 package render;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import render.mesh.Mesh;
 import util.Matrix4f;
 
 public abstract class GameObjectInit {
@@ -29,7 +29,7 @@ public abstract class GameObjectInit {
 	
 	public abstract void load(String param, String value);
 	
-	public abstract void loadObjectData() throws IOException, FileNotFoundException;
+	public abstract void loadObjectData(Mesh mesh);
 	
 	public abstract void loadShaders() throws IOException;
 	

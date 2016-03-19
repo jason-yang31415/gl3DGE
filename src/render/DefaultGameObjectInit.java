@@ -13,7 +13,6 @@ import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import io.FileLoader;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import org.lwjgl.BufferUtils;
 
 import render.mesh.Mesh;
-import render.mesh.OBJLoader;
 import render.mesh.Resource;
 import render.mesh.Vertex;
 import util.Matrix4f;
@@ -39,8 +37,8 @@ public class DefaultGameObjectInit extends GameObjectInit {
 	BumpMap bump;
 	EmissionMap emission;
 
-	String obj;
-	boolean smooth;
+//	String obj;
+//	boolean smooth;
 
 	public DefaultGameObjectInit() {
 		super("shader.vert", "shader.frag");
@@ -59,9 +57,6 @@ public class DefaultGameObjectInit extends GameObjectInit {
 				throw new RuntimeException(
 						"Shader specified in this file is not compatible with this shader");
 			break;
-		case "obj":
-			obj = value;
-			break;
 		case "texture":
 			texture = TextureMap.load(value);
 			break;
@@ -78,53 +73,43 @@ public class DefaultGameObjectInit extends GameObjectInit {
 		case "emission":
 			emission = EmissionMap.load(value);
 			break;
-		case "smooth":
-			smooth = Boolean.parseBoolean(value);
-			break;
 		}
 	}
 
-	public void loadObjectData() throws IOException, FileNotFoundException {
-		if (obj != "") {
-			// OBJLoader.loadGameObjectData(this, obj, smooth);
-			Mesh mesh = new Mesh();
-			OBJLoader.loadGameObjectData(mesh, obj, smooth);
-			
-			ArrayList<Float> vertex_data = new ArrayList<Float>();
-			for (Vertex v : mesh.getVertices()){
-				vertex_data.add(v.getPosition().x);
-				vertex_data.add(v.getPosition().y);
-				vertex_data.add(v.getPosition().z);
-				vertex_data.add(v.getNormal().x);
-				vertex_data.add(v.getNormal().y);
-				vertex_data.add(v.getNormal().z);
-				vertex_data.add(v.getDiffuseColor().x);
-				vertex_data.add(v.getDiffuseColor().y);
-				vertex_data.add(v.getDiffuseColor().z);
-				vertex_data.add(v.getSpecularColor().x);
-				vertex_data.add(v.getSpecularColor().y);
-				vertex_data.add(v.getSpecularColor().z);
-				vertex_data.add(v.getTextureCoordinate().x);
-				vertex_data.add(v.getTextureCoordinate().y);
-			}
+	public void loadObjectData(Mesh mesh){
+		ArrayList<Float> vertex_data = new ArrayList<Float>();
+		for (Vertex v : mesh.getVertices()){
+			vertex_data.add(v.getPosition().x);
+			vertex_data.add(v.getPosition().y);
+			vertex_data.add(v.getPosition().z);
+			vertex_data.add(v.getNormal().x);
+			vertex_data.add(v.getNormal().y);
+			vertex_data.add(v.getNormal().z);
+			vertex_data.add(v.getDiffuseColor().x);
+			vertex_data.add(v.getDiffuseColor().y);
+			vertex_data.add(v.getDiffuseColor().z);
+			vertex_data.add(v.getSpecularColor().x);
+			vertex_data.add(v.getSpecularColor().y);
+			vertex_data.add(v.getSpecularColor().z);
+			vertex_data.add(v.getTextureCoordinate().x);
+			vertex_data.add(v.getTextureCoordinate().y);
+		}
 
-			float[] vertArray = new float[vertex_data.size()];
-			for (int n = 0; n < vertex_data.size(); n++) {
-				vertArray[n] = vertex_data.get(n);
-			}
+		float[] vertArray = new float[vertex_data.size()];
+		for (int n = 0; n < vertex_data.size(); n++) {
+			vertArray[n] = vertex_data.get(n);
+		}
 
-			FloatBuffer vertices = BufferUtils.createFloatBuffer(vertArray.length);
-			vertices.put(vertArray).flip();
+		FloatBuffer vertices = BufferUtils.createFloatBuffer(vertArray.length);
+		vertices.put(vertArray).flip();
 
-			int[] indexArray = new int[mesh.getIndices().size()];
-			for (int i = 0; i < mesh.getIndices().size(); i++) {
-				indexArray[i] = mesh.getIndices().get(i);
-			}
+		int[] indexArray = new int[mesh.getIndices().size()];
+		for (int i = 0; i < mesh.getIndices().size(); i++) {
+			indexArray[i] = mesh.getIndices().get(i);
+		}
 
-			loadVertices(vertices);
-			loadIndices(indexArray);
-		} else
-			throw new FileNotFoundException("Could not find obj file");
+		loadVertices(vertices);
+		loadIndices(indexArray);
 	}
 
 	public void loadShaders() throws IOException {

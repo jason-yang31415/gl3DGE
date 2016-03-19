@@ -1,5 +1,8 @@
 package render;
 
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 import logic.Transform;
 
 public abstract class Drawable extends Transform {
@@ -18,6 +21,10 @@ public abstract class Drawable extends Transform {
 	public void rotate(float r, float x, float y, float z){
 		transform = transform.multiply(Matrix4f.rotate(r, x, y, z));
 	}*/
+	
+	public void setBlendFunc(){
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
 	
 	public void update(Scene scene){
 		/*shader.bind();
@@ -40,6 +47,7 @@ public abstract class Drawable extends Transform {
 			texture.unbind();
 		shader.unbind();
 		vao.unbind();*/
+		setBlendFunc();
 		goi.draw();
 	}
 	
