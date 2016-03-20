@@ -38,12 +38,15 @@ void main() {
 	vec3 lightColor = vec3(1, 1, 1);
 	
 	vec3 color;
+	float alpha = 1;
 	if (clamp(enableTex, 0, 1) == 0)
 		color = mat_in.diffuse;
-	else
+	else {
 		color = texture(tex, mat_in.texCoord).xyz;
+		alpha = texture(tex, mat_in.texCoord).w;
+	}
 	
-	vec3 Iamb = vec3(0.1, 0.1, 0.1) * color;
+	vec3 Iamb = vec3(0.1, 0.1, 0.1) * color.xyz;
 	//vec3 Iamb = mat_in.ambient;
 	
 	float distance = length(lightPos - position_worldspace);
@@ -87,5 +90,6 @@ void main() {
 		Iemission = texture(emission, mat_in.texCoord).xyz;
 	
 	vec3 outColor = Iamb + Idiff * (1 - roughness) + Ispec * roughness + Iemission;
-	fragColor = vec4(outColor, 1.0);
+	//fragColor = vec4(outColor, 1.0);
+	fragColor = vec4(outColor.xyz, alpha);
 }

@@ -65,7 +65,7 @@ public class GameObject extends Drawable {
 		
 		goi.check();
 		
-		return new GameObject(goi);
+		return new GameObject(goi, radius);
 	}
 	
 	/*public static GameObject loadFromFloatArray(float[] verts, Shader vertexShader, Shader fragmentShader, Texture texture){
@@ -90,7 +90,7 @@ public class GameObject extends Drawable {
 		v = new Vector3f();
 	}*/
 	
-	public GameObject(GameObjectInit goi){
+	public GameObject(GameObjectInit goi, float radius){
 		super(goi);
 		
 		// MVP
