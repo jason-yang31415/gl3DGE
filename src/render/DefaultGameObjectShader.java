@@ -23,9 +23,8 @@ import org.lwjgl.BufferUtils;
 import render.mesh.Mesh;
 import render.mesh.Resource;
 import render.mesh.Vertex;
-import util.Matrix4f;
 
-public class DefaultGameObjectInit extends GameObjectInit {
+public class DefaultGameObjectShader extends GameObjectShader {
 
 	int[] indices;
 
@@ -40,12 +39,12 @@ public class DefaultGameObjectInit extends GameObjectInit {
 //	String obj;
 //	boolean smooth;
 
-	public DefaultGameObjectInit() {
+	public DefaultGameObjectShader() {
 		super("shader.vert", "shader.frag");
 	}
 
 	@Override
-	public void load(String param, String value) {
+	public void loadMeshAttribute(String param, String value) {
 		switch (param) {
 		case "vertex":
 			if (!value.equals(vertexPath))
@@ -112,6 +111,10 @@ public class DefaultGameObjectInit extends GameObjectInit {
 		loadIndices(indexArray);
 	}
 
+	public void loadIndices(int[] indices) {
+		this.indices = indices;
+	}
+
 	public void loadShaders() throws IOException {
 		String vertexSource = FileLoader.loadFile(Resource.DEFAULT_SHADER_DIR
 				+ vertexPath);
@@ -122,10 +125,6 @@ public class DefaultGameObjectInit extends GameObjectInit {
 
 		loadVertexShader(vertexShader);
 		loadFragmentShader(fragmentShader);
-	}
-
-	public void loadIndices(int[] indices) {
-		this.indices = indices;
 	}
 
 	@Override
@@ -206,14 +205,6 @@ public class DefaultGameObjectInit extends GameObjectInit {
 		shader.unbind();
 		vbo.unbind(GL_ARRAY_BUFFER);
 		vao.unbind();
-	}
-
-	public void setMVP(Matrix4f model, Matrix4f view, Matrix4f projection) {
-		shader.bind();
-		shader.setUniformMat4f("model", model);
-		shader.setUniformMat4f("view", view);
-		shader.setUniformMat4f("projection", projection);
-		shader.unbind();
 	}
 
 	public void update(Scene scene, Drawable d) {

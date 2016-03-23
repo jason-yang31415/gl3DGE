@@ -7,11 +7,11 @@ import logic.Transform;
 
 public abstract class Drawable extends Transform {
 	
-	public GameObjectInit goi;
+	public ObjectShader os;
 	
-	public Drawable(GameObjectInit goi){
-		this.goi = goi;
-		goi.init();
+	public Drawable(ObjectShader os){
+		this.os = os;
+		os.init();
 	}
 	
 	/*public void translate(float x, float y, float z){
@@ -31,7 +31,7 @@ public abstract class Drawable extends Transform {
 		shader.setUniformMat4f("model", getMatrix());
 		shader.setUniformMat4f("view", cam.getLookAt());
 		shader.unbind();*/
-		goi.update(scene, this);
+		os.update(scene, this);
 	}
 	
 	public void draw(){
@@ -48,7 +48,7 @@ public abstract class Drawable extends Transform {
 		shader.unbind();
 		vao.unbind();*/
 		setBlendFunc();
-		goi.draw();
+		os.draw();
 	}
 	
 }

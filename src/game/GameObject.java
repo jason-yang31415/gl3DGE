@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 
 import logic.Transform;
 import render.Drawable;
-import render.GameObjectInit;
+import render.GameObjectShader;
 import render.mesh.Mesh;
 import render.mesh.OBJLoader;
 import render.mesh.Resource;
@@ -22,7 +22,7 @@ public class GameObject extends Drawable {
 	Vector3f v;
 	BoundingSphere bound;
 	
-	public static GameObject loadGameObject(String path, GameObjectInit goi) throws IOException {
+	public static GameObject loadGameObject(String path, GameObjectShader gos) throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(GameObject.class.getResourceAsStream(Resource.GAMEOBJECT_DIR + path)));
 		String line;
 		
@@ -46,7 +46,7 @@ public class GameObject extends Drawable {
 				smooth = Boolean.parseBoolean(value);
 				break;
 			default:
-				goi.load(param, value);
+				gos.loadMeshAttribute(param, value);
 				break;
 			}
 		}
@@ -57,15 +57,15 @@ public class GameObject extends Drawable {
 			Mesh mesh = new Mesh();
 			OBJLoader.loadGameObjectData(mesh, obj, smooth);
 			
-			goi.loadObjectData(mesh);
+			gos.loadObjectData(mesh);
 		} else
 			throw new FileNotFoundException("Could not find obj file");
 		
-		goi.loadShaders();
+		gos.loadShaders();
 		
-		goi.check();
+		gos.check();
 		
-		return new GameObject(goi, radius);
+		return new GameObject(gos, radius);
 	}
 	
 	/*public static GameObject loadFromFloatArray(float[] verts, Shader vertexShader, Shader fragmentShader, Texture texture){
@@ -90,7 +90,7 @@ public class GameObject extends Drawable {
 		v = new Vector3f();
 	}*/
 	
-	public GameObject(GameObjectInit goi, float radius){
+	public GameObject(GameObjectShader goi, float radius){
 		super(goi);
 		
 		// MVP

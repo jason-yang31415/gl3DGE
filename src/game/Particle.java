@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 import render.Camera;
 import render.Drawable;
-import render.GameObjectInit;
+import render.ParticleShader;
 import render.Scene;
 import render.mesh.Material;
 import render.mesh.Mesh;
@@ -21,7 +21,7 @@ import util.Vector4f;
 
 public class Particle extends Drawable {
 
-	public static Particle loadParticle(GameObjectInit goi, Vector3f color) throws IOException{
+	public static Particle loadParticle(ParticleShader ps, Vector3f color) throws IOException{
 		Mesh mesh = new Mesh();
 		
 		ArrayList<Vertex> verts = new ArrayList<Vertex>();
@@ -39,21 +39,21 @@ public class Particle extends Drawable {
 		ArrayList<Integer> indices = new ArrayList(Arrays.asList(index_array));
 		mesh.loadIndices(indices);
 		
-		goi.loadObjectData(mesh);
-		goi.loadShaders();
+		ps.loadObjectData(mesh);
+		ps.loadShaders();
 		
-		goi.check();
+		ps.check();
 		
-		return new Particle(goi);
+		return new Particle(ps);
 	}
 	
-	public Particle(GameObjectInit goi){
-		super(goi);
+	public Particle(ParticleShader ps){
+		super(ps);
 		
 		// MVP
 		float ratio = 1;
 		Matrix4f projection = Matrix4f.perspective(90, ratio, 0.01f, 100);
-		goi.setMVP(new Matrix4f(), new Matrix4f(), projection);
+		ps.setMVP(new Matrix4f(), new Matrix4f(), projection);
 	}
 	
 	@Override

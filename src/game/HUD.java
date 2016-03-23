@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import render.Drawable;
-import render.GameObjectInit;
+import render.GameObjectShader;
 import render.mesh.Material;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
@@ -19,7 +19,7 @@ import util.Vector3f;
 
 public class HUD extends Drawable {
 
-	public static HUD loadHUD(GameObjectInit goi, float width, float height, String texture_path) throws IOException {
+	public static HUD loadHUD(GameObjectShader goi, float width, float height, String texture_path) throws IOException {
 		Mesh mesh = new Mesh();
 		
 		ArrayList<Vertex> verts = new ArrayList<Vertex>();
@@ -37,8 +37,8 @@ public class HUD extends Drawable {
 		ArrayList<Integer> indices = new ArrayList(Arrays.asList(index_array));
 		mesh.loadIndices(indices);
 		
-		goi.load("texture", texture_path);
-		goi.load("emission", texture_path);
+		goi.loadMeshAttribute("texture", texture_path);
+		goi.loadMeshAttribute("emission", texture_path);
 		
 		goi.loadObjectData(mesh);
 		goi.loadShaders();
@@ -48,7 +48,7 @@ public class HUD extends Drawable {
 		return new HUD(goi, width, height);
 	}
 	
-	public HUD(GameObjectInit goi, float width, float height) {
+	public HUD(GameObjectShader goi, float width, float height) {
 		super(goi);
 		
 		// MVP
