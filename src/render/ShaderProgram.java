@@ -91,6 +91,10 @@ public class ShaderProgram {
 		glUniform3f(getUniform(name), vec.x, vec.y, vec.z);
 	}
 	
+	public void setUniformVec4f(String name, Vector4f vec){
+		glUniform4f(getUniform(name), vec.x, vec.y, vec.z, vec.w);
+	}
+	
 	public void setUniformMat4f(String name, Matrix4f matrix) {
         glUniformMatrix4fv(getUniform(name), false, matrix.getBuffer());
     }

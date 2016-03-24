@@ -1,11 +1,32 @@
 package render;
 
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL31.glDrawArraysInstanced;
+import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
+import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
+import game.Particle;
 import io.FileLoader;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
@@ -16,13 +37,31 @@ import render.mesh.Vertex;
 
 public class DefaultParticleShader extends ParticleShader {
 
+	public FloatBuffer positionData; // TEMP MAKE GETTERS
+	public FloatBuffer colorData; // TEMP MAKE GETTERS
+	
 	int[] indices;
+	
+	VertexBufferObject position_vbo;
+	VertexBufferObject color_vbo;
 	
 	int ebo;
 	
+	int maxParticles = 8; // TEMP
+	Particle[] particles;
+	
 	public DefaultParticleShader() {
-		super("shader.vert", "shader.frag"); // TEMP
-		// TODO Auto-generated constructor stub
+		super("particle.vert", "particle.frag");
+	}
+
+	@Override
+	public void setMaxParticles(int maxParticles){
+		this.maxParticles = maxParticles;
+		particles = new Particle[maxParticles];
+	}
+	
+	public void setParticles(Particle[] particles){
+		this.particles = particles;
 	}
 
 	@Override
@@ -32,17 +71,6 @@ public class DefaultParticleShader extends ParticleShader {
 			vertex_data.add(v.getPosition().x);
 			vertex_data.add(v.getPosition().y);
 			vertex_data.add(v.getPosition().z);
-			vertex_data.add(v.getNormal().x);
-			vertex_data.add(v.getNormal().y);
-			vertex_data.add(v.getNormal().z);
-			vertex_data.add(v.getDiffuseColor().x);
-			vertex_data.add(v.getDiffuseColor().y);
-			vertex_data.add(v.getDiffuseColor().z);
-			vertex_data.add(v.getSpecularColor().x);
-			vertex_data.add(v.getSpecularColor().y);
-			vertex_data.add(v.getSpecularColor().z);
-			vertex_data.add(v.getTextureCoordinate().x);
-			vertex_data.add(v.getTextureCoordinate().y);
 		}
 
 		float[] vertArray = new float[vertex_data.size()];
@@ -79,21 +107,79 @@ public class DefaultParticleShader extends ParticleShader {
 	}
 
 	@Override
-	public void init() {
-		// TODO Auto-generated method stub
+	public void init(){
+		count = indices.length;
 		
+		positionData = FloatBuffer.allocate(maxParticles * 4);
+		colorData = FloatBuffer.allocate(maxParticles * 4);
+
+		IntBuffer indexBuffer = BufferUtils.createIntBuffer(indices.length);
+		indexBuffer.put(indices).flip();
+
+		/*
+		 * for (int i : indices){ System.out.println(i); }
+		 */
+
+		// create vao and vbo
+		vao = new VertexArrayObject();
+		vao.bind();
+
+		vbo = new VertexBufferObject();
+		vbo.bind(GL_ARRAY_BUFFER);
+		vbo.bufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+		
+		int floatSize = 4; // TEMP; MOVE TO STATIC / CONST
+
+		ebo = glGenBuffers();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
+
+		// create shader program
+		shader = new ShaderProgram();
+		shader.attachShader(vertexShader);
+		shader.attachShader(fragmentShader);
+		shader.bindFragDataLocation(0, "fragColor");
+		shader.link();
+		shader.bind();
+		
+		int vertex_position_particle = shader.getAttribLocation("vertex_position_particle");
+		shader.enableVertexAttribArray(vertex_position_particle);
+		vbo.bind(GL_ARRAY_BUFFER);
+		shader.vertexAttribPointer(vertex_position_particle, 3, 3 * floatSize, 0);
+
+		shader.unbind();
+		vbo.unbind(GL_ARRAY_BUFFER);
+		vao.unbind();
 	}
 
 	@Override
 	public void update(Scene scene, Drawable d) {
-		// TODO Auto-generated method stub
-		
+		shader.bind();
+		shader.setUniformMat4f("model", d.getMatrix());
+		shader.setUniformMat4f("view", scene.getCamera().getLookAt());
+		shader.unbind();
 	}
 
 	@Override
 	public void draw() {
-		// TODO Auto-generated method stub
+		vao.bind();
+		vbo.bind(GL_ARRAY_BUFFER);
+		shader.bind();
 		
+		glDisable(GL_DEPTH_TEST);
+		
+		for (Particle p : particles){
+			if (p != null){
+				p.uniform(shader);
+				glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+			}
+		}
+		
+		glEnable(GL_DEPTH_TEST);
+		
+		shader.unbind();
+		vbo.unbind(GL_ARRAY_BUFFER);
+		vao.unbind();
 	}
 	
 }

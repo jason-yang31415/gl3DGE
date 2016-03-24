@@ -1,82 +1,62 @@
 package game;
 
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import render.Camera;
-import render.Drawable;
 import render.ParticleShader;
-import render.Scene;
-import render.mesh.Material;
-import render.mesh.Mesh;
-import render.mesh.Vertex;
-import util.Matrix4f;
-import util.Vector2f;
+import render.ShaderProgram;
 import util.Vector3f;
 import util.Vector4f;
 
-public class Particle extends Drawable {
+public class Particle {
 
-	public static Particle loadParticle(ParticleShader ps, Vector3f color) throws IOException{
-		Mesh mesh = new Mesh();
+	ParticleShader ps;
+	
+	Vector3f position;
+	Vector3f velocity;
+	Vector4f color;
+	float size, angle, weight;
+	float t, lifespan;
+	
+	public Particle(ParticleShader ps, Vector3f position, Vector3f velocity, Vector4f color, float size, float lifespan){
+		this.ps = ps;
 		
-		ArrayList<Vertex> verts = new ArrayList<Vertex>();
-		Material material = new Material();
-		material.setDiffuse(color);
-		material.setSpecular(new Vector3f(0, 0, 0));
-		
-		verts.add(new Vertex(new Vector3f(1, 1, 0), new Vector3f(0, 0, -1), material, new Vector2f(1, 1)));
-		verts.add(new Vertex(new Vector3f(-1, 1, 0), new Vector3f(0, 0, -1), material, new Vector2f(-1, 1)));
-		verts.add(new Vertex(new Vector3f(-1, -1, 0), new Vector3f(0, 0, -1), material, new Vector2f(-1, -1)));
-		verts.add(new Vertex(new Vector3f(1, -1, 0), new Vector3f(0, 0, -1), material, new Vector2f(1, -1)));
-		mesh.loadVertices(verts);
-		
-		Integer[] index_array = {3, 1, 0, 3, 2, 1};
-		ArrayList<Integer> indices = new ArrayList(Arrays.asList(index_array));
-		mesh.loadIndices(indices);
-		
-		ps.loadObjectData(mesh);
-		ps.loadShaders();
-		
-		ps.check();
-		
-		return new Particle(ps);
+		this.position = position;
+		this.velocity = velocity;
+		this.color = color;
+		this.size = size;
+		this.lifespan = lifespan;
+		t = 0;
 	}
 	
-	public Particle(ParticleShader ps){
-		super(ps);
-		
-		// MVP
-		float ratio = 1;
-		Matrix4f projection = Matrix4f.perspective(90, ratio, 0.01f, 100);
-		ps.setMVP(new Matrix4f(), new Matrix4f(), projection);
+	public void update(){
+		t++;
+		position = position.add(velocity);
+		color = color.scale(1 - t / lifespan);
 	}
 	
-	@Override
-	public void setBlendFunc(){
-		glBlendFunc(GL_ONE, GL_ONE);
+	public boolean isDead(){
+		if (t > lifespan)
+			return true;
+		return false;
 	}
 	
-	@Override
-	public void update(Scene scene){
-		super.update(scene);
-		Camera cam = scene.getCamera();
-		Matrix4f view = cam.getMatrix();
-		
-		//Vector3f camera_right = new Vector3f(view.m00, view.m10, view.m20);
-		Vector3f camera_up = new Vector3f(view.m01, view.m11, view.m21);
-		Vector3f camera_forward = getPos().subtract(cam.getPos()).normalize();
-		Vector3f camera_right = camera_up.cross(camera_forward);
-		rotate = new Matrix4f(
-			new Vector4f(camera_right.x, camera_right.y, camera_right.z, 0),
-			new Vector4f(camera_up.x, camera_up.y, camera_up.z, 0),
-			new Vector4f(camera_forward.x, camera_forward.y, camera_forward.z, 0),
-			new Vector4f(0, 0, 0, 1)
-		);
+	public void uniform(ShaderProgram shader){
+		shader.setUniformVec4f("particle_position_size", new Vector4f(position.x, position.y, position.z, size));
+		shader.setUniformVec4f("color", color);
+	}
+	
+	public Vector3f getPosition(){
+		return position;
+	}
+	
+	public Vector3f getVelocity(){
+		return velocity;
+	}
+	
+	public Vector4f getColor(){
+		return color;
+	}
+	
+	public float getSize(){
+		return size;
 	}
 	
 }

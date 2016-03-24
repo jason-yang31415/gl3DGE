@@ -3,8 +3,6 @@ package render;
 
 
 public abstract class GameObjectShader extends ObjectShader {
-
-	int count;
 	
 	public GameObjectShader(String vertexPath, String fragmentPath){
 		super(vertexPath, fragmentPath);

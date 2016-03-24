@@ -8,6 +8,8 @@ import util.Matrix4f;
 
 public abstract class ObjectShader {
 
+	int count;
+	
 	FloatBuffer vertices;
 	
 	VertexArrayObject vao;
@@ -62,6 +64,10 @@ public abstract class ObjectShader {
 		shader.setUniformMat4f("view", view);
 		shader.setUniformMat4f("projection", projection);
 		shader.unbind();
+	}
+	
+	public ShaderProgram getShader(){
+		return shader;
 	}
 	
 }
