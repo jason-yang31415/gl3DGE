@@ -6,7 +6,7 @@ gl3DGE uses OpenGL for rendering through LWJGL (separate library required).
 
 ********
 
-gl3DGE supports:
+## Features
 * OBJ loading
 * Texture maps
 * Specularity maps
@@ -16,7 +16,4 @@ gl3DGE supports:
 * Custom shaders
 * 3D transformations
 
-In progress
-* Particle systems
-* Normal maps
-* Modular framework design
+For in-development and planned features, see the [Roadmap](https://github.com/jason-yang31415/gl3DGE/wiki/Roadmap).
