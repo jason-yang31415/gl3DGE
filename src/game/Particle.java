@@ -1,7 +1,7 @@
 package game;
 
-import render.ParticleShader;
-import render.ShaderProgram;
+import render.shader.ParticleShader;
+import render.shader.ShaderProgram;
 import util.Vector3f;
 import util.Vector4f;
 

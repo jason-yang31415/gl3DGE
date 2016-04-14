@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import render.Drawable;
-import render.GameObjectShader;
 import render.mesh.Material;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
+import render.shader.GameObjectShader;
 import util.Matrix4f;
 import util.Vector2f;
 import util.Vector3f;

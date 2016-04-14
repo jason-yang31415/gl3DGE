@@ -7,10 +7,10 @@ import java.io.InputStreamReader;
 
 import logic.Transform;
 import render.Drawable;
-import render.GameObjectShader;
 import render.mesh.Mesh;
 import render.mesh.OBJLoader;
 import render.mesh.Resource;
+import render.shader.GameObjectShader;
 import util.Matrix4f;
 import util.Vector3f;
 

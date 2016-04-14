@@ -1,4 +1,4 @@
-package render;
+package render.shader;
 
 import game.Particle;
 

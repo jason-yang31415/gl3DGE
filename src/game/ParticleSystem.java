@@ -9,13 +9,13 @@ import java.util.Arrays;
 import java.util.Random;
 
 import render.Camera;
-import render.DefaultParticleShader;
 import render.Drawable;
-import render.ParticleShader;
 import render.Scene;
 import render.mesh.Material;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
+import render.shader.DefaultParticleShader;
+import render.shader.ParticleShader;
 import util.Matrix4f;
 import util.Vector2f;
 import util.Vector3f;

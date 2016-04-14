@@ -1,4 +1,4 @@
-package render;
+package render.shader;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -20,6 +20,15 @@ import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
 
+import render.BumpMap;
+import render.Drawable;
+import render.EmissionMap;
+import render.SamplerMap;
+import render.Scene;
+import render.SpecularityMap;
+import render.TextureMap;
+import render.VertexArrayObject;
+import render.VertexBufferObject;
 import render.mesh.Mesh;
 import render.mesh.Resource;
 import render.mesh.Vertex;

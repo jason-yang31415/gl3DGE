@@ -1,9 +1,10 @@
-package render;
+package render.shader;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glDepthMask;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
@@ -31,6 +32,10 @@ import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
 
+import render.Drawable;
+import render.Scene;
+import render.VertexArrayObject;
+import render.VertexBufferObject;
 import render.mesh.Mesh;
 import render.mesh.Resource;
 import render.mesh.Vertex;
@@ -166,7 +171,8 @@ public class DefaultParticleShader extends ParticleShader {
 		vbo.bind(GL_ARRAY_BUFFER);
 		shader.bind();
 		
-		glDisable(GL_DEPTH_TEST);
+		//glDisable(GL_DEPTH_TEST);
+		glDepthMask(false);
 		
 		for (Particle p : particles){
 			if (p != null){
@@ -175,7 +181,8 @@ public class DefaultParticleShader extends ParticleShader {
 			}
 		}
 		
-		glEnable(GL_DEPTH_TEST);
+		glDepthMask(true);
+		//glEnable(GL_DEPTH_TEST);
 		
 		shader.unbind();
 		vbo.unbind(GL_ARRAY_BUFFER);

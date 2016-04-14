@@ -1,4 +1,4 @@
-package render;
+package render.shader;
 
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL20.*;

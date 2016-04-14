@@ -1,7 +1,7 @@
 #version 150 core
 
 in Material {
-	vec3 ambient;
+	//vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
 	vec2 texCoord;

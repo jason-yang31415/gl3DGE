@@ -1,30 +1,43 @@
-package render;
+package render.shader;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import render.Drawable;
+import render.Scene;
+import render.VertexArrayObject;
+import render.VertexBufferObject;
 import render.mesh.Mesh;
 import util.Matrix4f;
 
 public abstract class ObjectShader {
 
-	int count;
+	protected int count;
 	
-	FloatBuffer vertices;
+	protected FloatBuffer vertices;
 	
-	VertexArrayObject vao;
-	VertexBufferObject vbo;
+	protected VertexArrayObject vao;
+	protected VertexBufferObject vbo;
 	
-	Shader vertexShader;
-	Shader fragmentShader;
-	ShaderProgram shader;
+	protected Shader vertexShader;
+	protected Shader fragmentShader;
+	protected ShaderProgram shader;
 	
-	String vertexPath;
-	String fragmentPath;
+	protected String vertexPath;
+	protected String fragmentPath;
 	
 	public ObjectShader(String vertexPath, String fragmentPath){
 		this.vertexPath = vertexPath;
 		this.fragmentPath = fragmentPath;
+	}
+	
+	public ObjectShader(Shader vertex, Shader fragment){
+		loadVertexShader(vertex);
+		loadFragmentShader(fragment);
+	}
+	
+	public ObjectShader(){
+		
 	}
 
 	public abstract void loadObjectData(Mesh mesh);
