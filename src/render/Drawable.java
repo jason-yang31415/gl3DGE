@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL11.glBlendFunc;
 import render.shader.ObjectShader;
 import logic.Transform;
 
-public abstract class Drawable extends Transform {
+public class Drawable extends Transform {
 	
 	public ObjectShader os;
 	

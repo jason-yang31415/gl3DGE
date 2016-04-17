@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -34,9 +37,11 @@ public class NodeBasedShader extends ObjectShader {
 
 	int ebo;
 	
-	ArrayList<ShaderNodeValue> inputs = new ArrayList<ShaderNodeValue>();
+	Map<String, ShaderNodeValue> inputs = new LinkedHashMap<String, ShaderNodeValue>();
+	ArrayList<ShaderNodeValue> uniforms = new ArrayList<ShaderNodeValue>();
+	ArrayList<ShaderNodeValue> constants = new ArrayList<ShaderNodeValue>();
 	ArrayList<ShaderNode> nodes = new ArrayList<ShaderNode>();
-	OutputSN out = new OutputSN();
+	OutputSN out = new OutputSN(this);
 	
 	int currentId = 0;
 	
@@ -84,27 +89,28 @@ public class NodeBasedShader extends ObjectShader {
 
 	@Override
 	public void loadShaders() throws IOException {
-		String vertexSource = 				"#version 150 core"
-								+ "\n" +	"in vec3 position;"
-								+ "\n" +	"in vec3 normal;"
-								+ "\n" +	"in vec3 in_color;"
-								+ "\n" +	"out vec3 N;"
-								+ "\n" +	"out vec3 v;"
-								+ "\n" +	"out vec3 color;"
-								+ "\n" +	"uniform mat4 model;"
-								+ "\n" +	"uniform mat4 view;"
-								+ "\n" +	"uniform mat4 projection;"
-								+ "\n" +	"uniform vec3 lightPos;"
-								+ "\n" +	"void main() {"
-								+ "\n" +	"	color = in_color;"
-								+ "\n" +	"	v = (model * vec4(position, 1)).xyz;"
-								+ "\n" +	"	N = normalize(normal);"
-								+ "\n" +	"	mat4 mvp = projection * view * model;"
-								+ "\n" +	"	gl_Position = mvp * vec4(position, 1.0);"
-								+ "\n" +	"}"
-								+ "\n" +	"";
+		StringBuilder sb = new StringBuilder();
+		sb.append("#version 150 core\n");
+		for (ShaderNodeValue input : inputs.values()){
+			sb.append("in " + input.getType() + " " + input.getAttribute() + ";\n");
+			sb.append("out " + input.getType() + " " + input.getVarying() + ";\n");
+		}
+		sb.append("uniform mat4 model;\n");
+		sb.append("uniform mat4 view;\n");
+		sb.append("uniform mat4 projection;\n");
+		sb.append("void main(){\n");
+		for (ShaderNodeValue input : inputs.values())
+			sb.append(input.getVertexGLSL());
+		sb.append("mat4 mvp = projection * view * model;\n");
+		sb.append("gl_Position = mvp * vec4(in_" + inputs.get(ShaderNodeValue.INPUT_POSITION).getName() + ", 1.0);\n");
+		sb.append("}\n");
+		
+		String vertexSource = sb.toString();
+		System.out.println(vertexSource);
+		
 		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
 		String fragmentSource = getFragmentSource();
+		System.out.println(fragmentSource);
 		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
 		loadVertexShader(vertexShader);
 		loadFragmentShader(fragmentShader);
@@ -113,16 +119,13 @@ public class NodeBasedShader extends ObjectShader {
 	public String getFragmentSource(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("#version 150 core\n");
-		sb.append("in vec3 N;\n");
-		sb.append("in vec3 v;\n");
-		sb.append("in vec3 color;\n");
+		for (ShaderNodeValue input : inputs.values())
+			sb.append("in " + input.getType() + " " + input.getVarying() + ";\n");
 		sb.append("out vec4 fragColor;\n");
 		sb.append("uniform vec3 lightPos;\n");
 		sb.append("void main() {\n");
-		sb.append("	vec3 global_position = v;\n");
-		sb.append("	vec3 global_normal = N;\n");
 		sb.append("	vec3 global_lightPos = lightPos;\n");
-		for (ShaderNodeValue snv : inputs){
+		for (ShaderNodeValue snv : constants){
 			sb.append(snv.getGLSL());
 		}
 		for (ShaderNode n : nodes){
@@ -139,8 +142,16 @@ public class NodeBasedShader extends ObjectShader {
 		nodes.add(node);
 	}
 	
-	public void addInput(ShaderNodeValue value){
-		inputs.add(value);
+	public void addInput(String name, ShaderNodeValue input){
+		inputs.put(name, input);
+	}
+	
+	public void addUniform(ShaderNodeValue value){
+		uniforms.add(value);
+	}
+	
+	public void addConstant(ShaderNodeValue value){
+		constants.add(value);
 	}
 	
 	public OutputSN getOutputNode(){
@@ -179,7 +190,7 @@ public class NodeBasedShader extends ObjectShader {
 		shader.bind();
 
 		int floatSize = 4;
-		int stride = 9;
+		/*int stride = 9;
 		int posAttrib = shader.getAttribLocation("position");
 		shader.enableVertexAttribArray(posAttrib);
 		shader.vertexAttribPointer(posAttrib, 3, stride * floatSize, 0);
@@ -190,7 +201,18 @@ public class NodeBasedShader extends ObjectShader {
 		int colorAttrib = shader.getAttribLocation("in_color");
 		shader.enableVertexAttribArray(colorAttrib);
 		shader.vertexAttribPointer(colorAttrib, 3, stride * floatSize,
-				6 * floatSize);
+				6 * floatSize);*/
+		int stride = 0;
+		for (ShaderNodeValue input : inputs.values())
+			stride += input.getSize();
+		System.out.println(stride);
+		int offset = 0;
+		for (ShaderNodeValue input : inputs.values()){
+			int attrib = shader.getAttribLocation(input.getAttribute());
+			shader.enableVertexAttribArray(attrib);
+			shader.vertexAttribPointer(attrib, input.getSize(), stride * floatSize, offset * floatSize);
+			offset += input.getSize();
+		}
 
 		shader.unbind();
 		vbo.unbind(GL_ARRAY_BUFFER);

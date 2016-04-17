@@ -2,8 +2,8 @@ package render.shader;
 
 public class AddSN extends ShaderNode {
 
-	public AddSN(int id) {
-		super(id);
+	public AddSN(NodeBasedShader nbs) {
+		super(nbs, nbs.genNodes());
 		
 		init();
 	}

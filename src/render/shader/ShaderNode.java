@@ -6,6 +6,7 @@ import java.util.Map;
 
 public abstract class ShaderNode {
 
+	final NodeBasedShader nbs;
 	final int id;
 	
 	String glsl;
@@ -13,7 +14,8 @@ public abstract class ShaderNode {
 	Map<String, ShaderNodeValue> inputs = new HashMap<String, ShaderNodeValue>();
 	Map<String, ShaderNodeValue> outputs = new HashMap<String, ShaderNodeValue>();
 	
-	public ShaderNode(int id){
+	public ShaderNode(NodeBasedShader nbs, int id){
+		this.nbs = nbs;
 		this.id = id;
 	}
 	

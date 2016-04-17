@@ -2,8 +2,8 @@ package render.shader;
 
 public class OutputSN extends ShaderNode {
 
-	public OutputSN() {
-		super(0);
+	public OutputSN(NodeBasedShader nbs) {
+		super(nbs, 0);
 		
 		init();
 	}
