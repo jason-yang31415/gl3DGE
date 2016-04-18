@@ -55,15 +55,23 @@ public class NodeBasedShader extends ObjectShader {
 	public void loadObjectData(Mesh mesh) {
 		ArrayList<Float> vertex_data = new ArrayList<Float>();
 		for (Vertex v : mesh.getVertices()){
-			vertex_data.add(v.getPosition().x);
-			vertex_data.add(v.getPosition().y);
-			vertex_data.add(v.getPosition().z);
-			vertex_data.add(v.getNormal().x);
-			vertex_data.add(v.getNormal().y);
-			vertex_data.add(v.getNormal().z);
-			vertex_data.add(v.getDiffuseColor().x);
-			vertex_data.add(v.getDiffuseColor().y);
-			vertex_data.add(v.getDiffuseColor().z);
+			for (String key : inputs.keySet()){
+				if (key.equals(ShaderNodeValue.INPUT_POSITION)){
+					vertex_data.add(v.getPosition().x);
+					vertex_data.add(v.getPosition().y);
+					vertex_data.add(v.getPosition().z);
+				}
+				else if (key.equals(ShaderNodeValue.INPUT_NORMAL)){
+					vertex_data.add(v.getNormal().x);
+					vertex_data.add(v.getNormal().y);
+					vertex_data.add(v.getNormal().z);
+				}
+				else if (key.equals(ShaderNodeValue.INPUT_COLOR)){
+					vertex_data.add(v.getDiffuseColor().x);
+					vertex_data.add(v.getDiffuseColor().y);
+					vertex_data.add(v.getDiffuseColor().z);
+				}
+			}
 		}
 
 		float[] vertArray = new float[vertex_data.size()];
@@ -106,11 +114,9 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("}\n");
 		
 		String vertexSource = sb.toString();
-		System.out.println(vertexSource);
 		
 		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
 		String fragmentSource = getFragmentSource();
-		System.out.println(fragmentSource);
 		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
 		loadVertexShader(vertexShader);
 		loadFragmentShader(fragmentShader);
@@ -205,7 +211,7 @@ public class NodeBasedShader extends ObjectShader {
 		int stride = 0;
 		for (ShaderNodeValue input : inputs.values())
 			stride += input.getSize();
-		System.out.println(stride);
+		
 		int offset = 0;
 		for (ShaderNodeValue input : inputs.values()){
 			int attrib = shader.getAttribLocation(input.getAttribute());
