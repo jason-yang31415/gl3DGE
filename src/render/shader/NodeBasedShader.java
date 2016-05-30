@@ -259,6 +259,7 @@ public class NodeBasedShader extends ObjectShader {
 		shader.setUniformMat4f("model", d.getMatrix());
 		shader.setUniformMat4f("view", scene.getCamera().getLookAt());
 		shader.setUniformVec3f(uniforms.get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName(), scene.getLight().getPos());
+		shader.setUniformVec3f(uniforms.get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName(), scene.getCamera().getPos());
 		shader.unbind();
 	}
 	

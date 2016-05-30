@@ -8,6 +8,7 @@ public abstract class ShaderNodeValue {
 	public static String INPUT_TEXTURE_COORDINATE = "texture_coordinate";
 	
 	public static String UNIFORM_LIGHT_POSITION = "light_position";
+	public static String UNIFORM_CAMERA_POSITION = "camera_position";
 	
 	final ShaderNode parent;
 	final String name;

@@ -10,6 +10,7 @@ public class SamplerSN extends ShaderNode {
 	
 	public void init(){
 		inputs.put("in_sampler", null);
+		inputs.put("in_texturecoordinate", null);
 		outputs.put("out_color", new ColorSNV(this, "color"));
 	}
 	
