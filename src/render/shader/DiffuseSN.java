@@ -26,7 +26,7 @@ public class DiffuseSN extends ShaderNode {
 	
 	public String getGLSL(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("vec3 " + variable("L") + " = normalize(global_lightPos - " + nbs.inputs.get(ShaderNodeValue.INPUT_POSITION).getName() + ");\n");
+		sb.append("vec3 " + variable("L") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName() + " - " + nbs.getInputNode().getOutPosition().getName() + ");\n");
 		sb.append("float " + variable("cosTheta") + " = clamp(dot(" + nbs.inputs.get(ShaderNodeValue.INPUT_NORMAL).getName() + ", " + variable("L") + "), 0, 1);\n");
 		sb.append("vec3 " + getOutColor().getName() + " = " + inputs.get("in_color").getName() + " * " + variable("cosTheta") + ";\n");
 		sb.append(outputs.get("out_color").getName() + " = clamp(" + outputs.get("out_color").getName() + ", 0, 1);\n");

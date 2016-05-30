@@ -6,6 +6,8 @@ public abstract class ShaderNodeValue {
 	public static String INPUT_NORMAL = "normal";
 	public static String INPUT_COLOR = "color";
 	
+	public static String UNIFORM_LIGHT_POSITION = "light_position";
+	
 	final ShaderNode parent;
 	final String name;
 	int size;
@@ -16,7 +18,14 @@ public abstract class ShaderNodeValue {
 	}
 	
 	public String getName(){
-		return String.format("%s_v%s", (parent == null ? "input" : parent.getName()), name);
+		String parentString = null;
+		if (parent instanceof InputSN)
+			parentString = "input";
+		else if (parent == null)
+			parentString = "constant";
+		else
+			parentString = parent.getName();
+		return String.format("%s_v%s", parentString, name);
 	}
 	
 	public int getSize(){

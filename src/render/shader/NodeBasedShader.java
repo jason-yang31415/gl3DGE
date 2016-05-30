@@ -38,9 +38,10 @@ public class NodeBasedShader extends ObjectShader {
 	int ebo;
 	
 	Map<String, ShaderNodeValue> inputs = new LinkedHashMap<String, ShaderNodeValue>();
-	ArrayList<ShaderNodeValue> uniforms = new ArrayList<ShaderNodeValue>();
+	Map<String, ShaderNodeValue> uniforms = new LinkedHashMap<String, ShaderNodeValue>();
 	ArrayList<ShaderNodeValue> constants = new ArrayList<ShaderNodeValue>();
 	ArrayList<ShaderNode> nodes = new ArrayList<ShaderNode>();
+	InputSN in = new InputSN(this);
 	OutputSN out = new OutputSN(this);
 	
 	int currentId = 0;
@@ -114,10 +115,12 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("}\n");
 		
 		String vertexSource = sb.toString();
-		
 		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
+		System.out.println(vertexSource);
 		String fragmentSource = getFragmentSource();
+		System.out.println(fragmentSource);
 		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
+		
 		loadVertexShader(vertexShader);
 		loadFragmentShader(fragmentShader);
 	}
@@ -128,9 +131,11 @@ public class NodeBasedShader extends ObjectShader {
 		for (ShaderNodeValue input : inputs.values())
 			sb.append("in " + input.getType() + " " + input.getVarying() + ";\n");
 		sb.append("out vec4 fragColor;\n");
-		sb.append("uniform vec3 lightPos;\n");
+		for (ShaderNodeValue uniform : uniforms.values())
+			sb.append("uniform " + uniform.getType() + " " + uniform.getName() + ";\n");
+		//sb.append("uniform vec3 lightPos;\n");
 		sb.append("void main() {\n");
-		sb.append("	vec3 global_lightPos = lightPos;\n");
+		//sb.append("	vec3 global_lightPos = lightPos;\n");
 		for (ShaderNodeValue snv : constants){
 			sb.append(snv.getGLSL());
 		}
@@ -152,12 +157,20 @@ public class NodeBasedShader extends ObjectShader {
 		inputs.put(name, input);
 	}
 	
-	public void addUniform(ShaderNodeValue value){
-		uniforms.add(value);
+	public void addUniform(String name, ShaderNodeValue uniform){
+		uniforms.put(name, uniform);
 	}
 	
 	public void addConstant(ShaderNodeValue value){
 		constants.add(value);
+	}
+	
+	public InputSN getInputNode(){
+		return in;
+	}
+	
+	public Map<String, ShaderNodeValue> getUniforms(){
+		return uniforms;
 	}
 	
 	public OutputSN getOutputNode(){
@@ -230,7 +243,7 @@ public class NodeBasedShader extends ObjectShader {
 		shader.bind();
 		shader.setUniformMat4f("model", d.getMatrix());
 		shader.setUniformMat4f("view", scene.getCamera().getLookAt());
-		shader.setUniformVec3f("lightPos", scene.getLight().getPos());
+		shader.setUniformVec3f(uniforms.get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName(), scene.getLight().getPos());
 		shader.unbind();
 	}
 
