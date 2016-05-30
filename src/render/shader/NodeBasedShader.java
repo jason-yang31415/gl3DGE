@@ -44,6 +44,8 @@ public class NodeBasedShader extends ObjectShader {
 	InputSN in = new InputSN(this);
 	OutputSN out = new OutputSN(this);
 	
+	ArrayList<SamplerMap> samplers = new ArrayList<SamplerMap>();
+	
 	int currentId = 0;
 	
 	public int genNodes(){
@@ -71,6 +73,10 @@ public class NodeBasedShader extends ObjectShader {
 					vertex_data.add(v.getDiffuseColor().x);
 					vertex_data.add(v.getDiffuseColor().y);
 					vertex_data.add(v.getDiffuseColor().z);
+				}
+				else if (key.equals(ShaderNodeValue.INPUT_TEXTURE_COORDINATE)){
+					vertex_data.add(v.getTextureCoordinate().x);
+					vertex_data.add(v.getTextureCoordinate().y);
 				}
 			}
 		}
@@ -165,6 +171,10 @@ public class NodeBasedShader extends ObjectShader {
 		constants.add(value);
 	}
 	
+	public void addSampler(SamplerMap sampler){
+		samplers.add(sampler);
+	}
+	
 	public InputSN getInputNode(){
 		return in;
 	}
@@ -232,7 +242,12 @@ public class NodeBasedShader extends ObjectShader {
 			shader.vertexAttribPointer(attrib, input.getSize(), stride * floatSize, offset * floatSize);
 			offset += input.getSize();
 		}
-
+		
+		for (ShaderNodeValue snv : uniforms.values()){
+			if (snv instanceof SamplerSNV)
+				shader.setUniform1i(snv.getName(), ((SamplerSNV) snv).getSampler().getLocation());
+		}
+		
 		shader.unbind();
 		vbo.unbind(GL_ARRAY_BUFFER);
 		vao.unbind();
@@ -246,12 +261,24 @@ public class NodeBasedShader extends ObjectShader {
 		shader.setUniformVec3f(uniforms.get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName(), scene.getLight().getPos());
 		shader.unbind();
 	}
+	
+	public void bindSamplers(){
+		for (SamplerMap sm : samplers)
+			sm.bind();
+	}
+	
+	public void unbindSamplers(){
+		for (SamplerMap sm : samplers)
+			sm.unbind();
+	}
 
 	@Override
 	public void draw() {
 		vao.bind();
 		shader.bind();
+		bindSamplers();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+		unbindSamplers();
 		shader.unbind();
 		vao.unbind();
 	}

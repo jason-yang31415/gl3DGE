@@ -1,9 +1,20 @@
 package render;
 
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_REPEAT;
+import static org.lwjgl.opengl.GL11.GL_RGBA;
+import static org.lwjgl.opengl.GL11.GL_RGBA8;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glTexImage2D;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import io.ImageLoader;
@@ -16,7 +27,7 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
 
-public abstract class SamplerMap {
+public class SamplerMap {
 
 	public static int TEX_DEFAULT = 0;
 	public static int SPEC_DEFAULT = 1;
@@ -24,14 +35,27 @@ public abstract class SamplerMap {
 	public static int EMISSION_DEFAULT = 3;
 	
 	public final int id;
+	public final int location;
 	
 	private int width, height;
 	
-	public SamplerMap(int width, int height, ByteBuffer image){
+	public SamplerMap(int width, int height, ByteBuffer image, int location){
 		id = glGenTextures();
+		this.location = location;
 		
 		this.width = width;
 		this.height = height;
+		
+		bindActiveTexture();
+		glBindTexture(GL_TEXTURE_2D, id);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+		
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		unbindActiveTexture();
 	}
 	
 	public void bind(){
@@ -46,7 +70,9 @@ public abstract class SamplerMap {
 		//unbindActiveTexture();
 	}
 	
-	public abstract void bindActiveTexture();
+	public void bindActiveTexture(){
+		glActiveTexture(GL_TEXTURE0 + location);
+	}
 	
 	public void unbindActiveTexture(){
 		glActiveTexture(GL_TEXTURE0);
@@ -60,11 +86,15 @@ public abstract class SamplerMap {
 		return height;
 	}
 	
+	public int getLocation(){
+		return location;
+	}
+	
 	public void delete(){
 		glDeleteTextures(id);
 	}
 	
-	public static ByteBuffer loadImage(String path){
+	public static SamplerMap load(String path, int location){
 		BufferedImage image = null;
 		try {
 			image = ImageLoader.loadImage(path);
@@ -101,11 +131,7 @@ public abstract class SamplerMap {
 		}
 		buffer.flip();
 		
-		return buffer;
-	}
-	
-	public static SamplerMap load(String path){
-		return null;
+		return new SamplerMap(width, height, buffer, location);
 	}
 	
 }

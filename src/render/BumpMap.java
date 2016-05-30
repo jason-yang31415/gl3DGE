@@ -30,7 +30,7 @@ import render.mesh.Resource;
 public class BumpMap extends SamplerMap {
 	
 	public BumpMap(int width, int height, ByteBuffer image){
-		super(width, height, image);
+		super(width, height, image, SamplerMap.BUMP_DEFAULT);
 		
 		bindActiveTexture();
 		glBindTexture(GL_TEXTURE_2D, id);
@@ -41,10 +41,6 @@ public class BumpMap extends SamplerMap {
 		
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 		unbindActiveTexture();
-	}
-	
-	public void bindActiveTexture(){
-		glActiveTexture(GL_TEXTURE0 + SamplerMap.BUMP_DEFAULT);
 	}
 	
 	public static BumpMap load(String path){

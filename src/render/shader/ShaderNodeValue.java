@@ -5,6 +5,7 @@ public abstract class ShaderNodeValue {
 	public static String INPUT_POSITION = "position";
 	public static String INPUT_NORMAL = "normal";
 	public static String INPUT_COLOR = "color";
+	public static String INPUT_TEXTURE_COORDINATE = "texture_coordinate";
 	
 	public static String UNIFORM_LIGHT_POSITION = "light_position";
 	

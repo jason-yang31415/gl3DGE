@@ -30,7 +30,7 @@ import render.mesh.Resource;
 public class TextureMap extends SamplerMap {
 	
 	public TextureMap(int width, int height, ByteBuffer image){
-		super(width, height, image);
+		super(width, height, image, SamplerMap.TEX_DEFAULT);
 		
 		bindActiveTexture();
 		glBindTexture(GL_TEXTURE_2D, id);
@@ -42,10 +42,6 @@ public class TextureMap extends SamplerMap {
 		
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 		unbindActiveTexture();
-	}
-	
-	public void bindActiveTexture(){
-		glActiveTexture(GL_TEXTURE0 + SamplerMap.TEX_DEFAULT);
 	}
 	
 	public static TextureMap load(String path){
