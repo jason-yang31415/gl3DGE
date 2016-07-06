@@ -2,20 +2,20 @@ package render.shader;
 
 import util.Vector3f;
 
-public class ColorSNV extends ShaderNodeValue {
+public class ColorSNV extends ValueSNV {
 
-	Vector3f color;
+	//Vector3f color;
 	
 	public ColorSNV(ShaderNode parent, String name) {
 		super(parent, name);
-		size = 3;
+		defineAsVector3f();
 	}
 	
 	public void setColor(Vector3f color){
-		this.color = color;
+		defineAsVector3f(color);
 	}
 	
-	public String getType(){
+	/*public String getType(){
 		return "vec3";
 	}
 	
@@ -33,6 +33,6 @@ public class ColorSNV extends ShaderNodeValue {
 	
 	public String getVertexGLSL(){
 		return getName() + " = in_" + getName() + ";\n";
-	}
+	}*/
 
 }

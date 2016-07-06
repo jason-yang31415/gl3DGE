@@ -39,7 +39,7 @@ public class SamplerMap {
 	
 	private int width, height;
 	
-	public SamplerMap(int width, int height, ByteBuffer image, int location){
+	public SamplerMap(int width, int height, int location){
 		id = glGenTextures();
 		this.location = location;
 		
@@ -52,10 +52,19 @@ public class SamplerMap {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-		
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 		unbindActiveTexture();
+	}
+	
+	public void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, ByteBuffer pixels){
+		bind();
+		glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+		unbind();
+	}
+	
+	public void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, long pixelOffset){
+		bind();
+		glTexImage2D(target, level, internalformat, width, height, border, format, type, pixelOffset);
+		unbind();
 	}
 	
 	public void bind(){
@@ -92,6 +101,10 @@ public class SamplerMap {
 	
 	public void delete(){
 		glDeleteTextures(id);
+	}
+	
+	public int getID(){
+		return id;
 	}
 	
 	public static SamplerMap load(String path, int location){
@@ -131,7 +144,11 @@ public class SamplerMap {
 		}
 		buffer.flip();
 		
-		return new SamplerMap(width, height, buffer, location);
+		SamplerMap samplerMap = new SamplerMap(width, height, location);
+		
+		samplerMap.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+		
+		return samplerMap;
 	}
 	
 }

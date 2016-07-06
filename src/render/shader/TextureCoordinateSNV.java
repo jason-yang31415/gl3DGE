@@ -2,20 +2,20 @@ package render.shader;
 
 import util.Vector2f;
 
-public class TextureCoordinateSNV extends ShaderNodeValue {
+public class TextureCoordinateSNV extends ValueSNV {
 
-	Vector2f textureCoordinate;
+	//Vector2f textureCoordinate;
 	
 	public TextureCoordinateSNV(ShaderNode parent, String name) {
 		super(parent, name);
-		size = 2;
+		defineAsVector2f();
 	}
 	
 	public void setTextureCoordinate(Vector2f textureCoordinate){
-		this.textureCoordinate = textureCoordinate;
+		defineAsVector2f(textureCoordinate);
 	}
 
-	public String getType(){
+	/*public String getType(){
 		return "vec2";
 	}
 	
@@ -33,6 +33,6 @@ public class TextureCoordinateSNV extends ShaderNodeValue {
 	
 	public String getVertexGLSL(){
 		return getName() + " = in_" + getName() + ";\n";
-	}
+	}*/
 
 }

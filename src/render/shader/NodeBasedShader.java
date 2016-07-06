@@ -121,8 +121,8 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("}\n");
 		
 		String vertexSource = sb.toString();
-		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
 		System.out.println(vertexSource);
+		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
 		String fragmentSource = getFragmentSource();
 		System.out.println(fragmentSource);
 		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);

@@ -20,7 +20,7 @@ public class BeckmannSpecularSN extends ShaderNode {
 	public FloatSNV getOutKspec(){
 		return (FloatSNV) outputs.get("out_kspec");
 	}
-
+	
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("vec3 " + variable("L") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName() + " - " + nbs.getInputNode().getOutPosition().getName() + ");\n");

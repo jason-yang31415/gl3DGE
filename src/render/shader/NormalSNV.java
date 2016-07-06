@@ -2,20 +2,20 @@ package render.shader;
 
 import util.Vector3f;
 
-public class NormalSNV extends ShaderNodeValue {
+public class NormalSNV extends ValueSNV {
 
-	Vector3f normal;
+	//Vector3f normal;
 	
 	public NormalSNV(ShaderNode parent, String name) {
 		super(parent, name);
-		size = 3;
+		defineAsVector3f();
 	}
 	
 	public void setNormal(Vector3f normal){
-		this.normal = normal;
+		defineAsVector3f(normal);
 	}
 	
-	public String getType(){
+	/*public String getType(){
 		return "vec3";
 	}
 	
@@ -33,6 +33,6 @@ public class NormalSNV extends ShaderNodeValue {
 	
 	public String getVertexGLSL(){
 		return getName() + " = in_" + getName() + ";\n";
-	}
+	}*/
 
 }

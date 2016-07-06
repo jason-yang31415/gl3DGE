@@ -20,9 +20,12 @@ public class Vertex {
 	
 	public Vertex(Vector3f position, Vector3f normal, Material mat, Vector2f tex){
 		setPosition(position);
-		setNormal(normal);
-		setMaterial(mat);
-		setTextureCoordinate(tex);
+		if (normal != null)
+			setNormal(normal);
+		if (mat != null)
+			setMaterial(mat);
+		if (tex != null)
+			setTextureCoordinate(tex);
 	}
 	
 	public void setPosition(Vector3f position){

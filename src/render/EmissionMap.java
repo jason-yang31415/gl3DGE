@@ -30,7 +30,7 @@ import render.mesh.Resource;
 public class EmissionMap extends SamplerMap {
 	
 	public EmissionMap(int width, int height, ByteBuffer image){
-		super(width, height, image, SamplerMap.EMISSION_DEFAULT);
+		super(width, height, SamplerMap.EMISSION_DEFAULT);
 		
 		bindActiveTexture();
 		glBindTexture(GL_TEXTURE_2D, id);

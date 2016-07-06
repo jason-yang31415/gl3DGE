@@ -30,7 +30,7 @@ import render.mesh.Resource;
 public class SpecularityMap extends SamplerMap {
 	
 	public SpecularityMap(int width, int height, ByteBuffer image){
-		super(width, height, image, SamplerMap.SPEC_DEFAULT);
+		super(width, height, SamplerMap.SPEC_DEFAULT);
 		
 		bindActiveTexture();
 		glBindTexture(GL_TEXTURE_2D, id);
