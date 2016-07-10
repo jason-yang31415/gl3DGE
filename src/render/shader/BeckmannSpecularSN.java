@@ -10,15 +10,15 @@ public class BeckmannSpecularSN extends ShaderNode {
 	
 	public void init(){
 		inputs.put("in_roughness", null);
-		outputs.put("out_kspec", new FloatSNV(this, "kspec"));
+		outputs.put("out_kspec", new ValueSNV(this, "kspec"));
 	}
 	
-	public void setInRoughness(FloatSNV roughness){
+	public void setInRoughness(ValueSNV roughness){
 		inputs.put("in_roughness", roughness);
 	}
 	
-	public FloatSNV getOutKspec(){
-		return (FloatSNV) outputs.get("out_kspec");
+	public ValueSNV getOutKspec(){
+		return (ValueSNV) outputs.get("out_kspec");
 	}
 	
 	public String getGLSL() {

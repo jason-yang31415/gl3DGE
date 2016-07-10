@@ -14,7 +14,7 @@ public class MultiplySN extends ShaderNode {
 		outputs.put("out_color", new ColorSNV(this, "color"));
 	}
 	
-	public void setInValue(FloatSNV color){
+	public void setInValue(ValueSNV color){
 		inputs.put("in_value", color);
 	}
 	

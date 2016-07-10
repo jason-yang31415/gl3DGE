@@ -9,11 +9,11 @@ public class OutputSN extends ShaderNode {
 	}
 	
 	public void init(){
-		inputs.put("in_color", null);
+		inputs.put("in_value", null);
 	}
 	
-	public void setInColor(ColorSNV color){
-		inputs.put("in_color", color);
+	public void setInValue(ValueSNV value){
+		inputs.put("in_value", value);
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class OutputSN extends ShaderNode {
 	@Override
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("fragColor = vec4(" + inputs.get("in_color").getName() + ", 1);\n");
+		sb.append("fragColor = vec4(" + inputs.get("in_value").getName() + ", 1);\n");
 		//sb.append("fragColor = vec4(1, 1, 1, 1);\n");
 		glsl = sb.toString();
 		return glsl;

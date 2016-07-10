@@ -10,15 +10,15 @@ public class PhongSpecularSN extends ShaderNode {
 	
 	public void init(){
 		inputs.put("in_power", null);
-		outputs.put("out_kspec", new FloatSNV(this, "kspec"));
+		outputs.put("out_kspec", new ValueSNV(this, "kspec"));
 	}
 	
-	public void setInPower(FloatSNV power){
+	public void setInPower(ValueSNV power){
 		inputs.put("in_power", power);
 	}
 	
-	public FloatSNV getOutKspec(){
-		return (FloatSNV) outputs.get("out_kspec");
+	public ValueSNV getOutKspec(){
+		return (ValueSNV) outputs.get("out_kspec");
 	}
 
 	@Override
