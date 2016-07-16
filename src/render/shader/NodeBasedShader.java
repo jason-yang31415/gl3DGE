@@ -139,6 +139,9 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("out vec4 fragColor;\n");
 		for (ShaderNodeValue uniform : uniforms.values())
 			sb.append("uniform " + uniform.getType() + " " + uniform.getName() + ";\n");
+		sb.append("uniform mat4 model;\n");
+		sb.append("uniform mat4 view;\n");
+		sb.append("uniform mat4 projection;\n");
 		//sb.append("uniform vec3 lightPos;\n");
 		sb.append("void main() {\n");
 		//sb.append("	vec3 global_lightPos = lightPos;\n");

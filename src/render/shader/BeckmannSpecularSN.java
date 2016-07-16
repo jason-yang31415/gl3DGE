@@ -10,11 +10,16 @@ public class BeckmannSpecularSN extends ShaderNode {
 	
 	public void init(){
 		inputs.put("in_roughness", null);
+		inputs.put("in_normal", nbs.getInputNode().getOutNormal());
 		outputs.put("out_kspec", new ValueSNV(this, "kspec"));
 	}
 	
 	public void setInRoughness(ValueSNV roughness){
 		inputs.put("in_roughness", roughness);
+	}
+
+	public void setInNormal(NormalSNV normal){
+		inputs.put("in_normal", normal);
 	}
 	
 	public ValueSNV getOutKspec(){
@@ -26,7 +31,7 @@ public class BeckmannSpecularSN extends ShaderNode {
 		sb.append("vec3 " + variable("L") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName() + " - " + nbs.getInputNode().getOutPosition().getName() + ");\n");
 		sb.append("vec3 " + variable("E") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName() + " - " + nbs.getInputNode().getOutPosition().getName() + ");\n");
 		sb.append("vec3 " + variable("H") + " = normalize(" + variable("L") + " + " + variable("E") + ");\n");
-		sb.append("float " + variable("cos") + " = dot(" + nbs.getInputNode().getOutNormal().getName() + ", " + variable("H") + ");\n");
+		sb.append("float " + variable("cos") + " = dot(" + inputs.get("in_normal").getName() + ", " + variable("H") + ");\n");
 		sb.append("float " + variable("e") + " = 2.71828183;\n");
 		sb.append("float " + variable("num") + " = pow(" + variable("e") + ", (pow(" + variable("cos") + ", 2) - 1)/(pow(" + variable("cos") + ", 2) * pow(" + inputs.get("in_roughness").getName() + ", 2)));\n");
 		sb.append("float " + variable("den") + " = 3.1415927 * pow(" + inputs.get("in_roughness").getName() + ", 2) * pow(" + variable("cos") + ", 4);\n");

@@ -14,44 +14,52 @@ public class ValueSNV extends ShaderNodeValue {
 		super(parent, name);
 	}
 	
-	public void defineAsFloat(){
+	public ValueSNV defineAsFloat(){
 		type = "float";
 		size = 1;
+		return this;
 	}
 	
-	public void defineAsFloat(float value){
+	public ValueSNV defineAsFloat(float value){
 		defineAsFloat();
 		definition = String.format("%f", value);
+		return this;
 	}
 	
-	public void defineAsVector2f(){
+	public ValueSNV defineAsVector2f(){
 		type = "vec2";
 		size = 2;
+		return this;
 	}
 	
-	public void defineAsVector2f(Vector2f value){
+	public ValueSNV defineAsVector2f(Vector2f value){
 		defineAsVector2f();
 		definition = String.format("vec2(%f, %f)", value.x, value.y);
+		return this;
 	}
 	
-	public void defineAsVector3f(){
+	public ValueSNV defineAsVector3f(){
 		type = "vec3";
 		size = 3;
+		return this;
 	}
 	
-	public void defineAsVector3f(Vector3f value){
+	public ValueSNV defineAsVector3f(Vector3f value){
 		defineAsVector3f();
 		definition = String.format("vec3(%f, %f, %f)", value.x, value.y, value.z);
+		return this;
 	}
 	
-	public void defineAsVector4f(){
+	public ValueSNV defineAsVector4f(){
 		type = "vec4";
 		size = 4;
+		return this;
 	}
 	
-	public void defineAsVector4f(Vector4f value){
+	public ValueSNV defineAsVector4f(Vector4f value){
 		defineAsVector4f();
 		definition = String.format("vec4(%f, %f, %f, %f)", value.x, value.y, value.z, value.w);
+		return this;
 	}
 
 	@Override
