@@ -3,7 +3,7 @@ package logic;
 import util.Matrix4f;
 import util.Vector3f;
 
-public abstract class Transform {
+public class Transform {
 	
 	public static enum Type {
 		T2D,
@@ -13,6 +13,7 @@ public abstract class Transform {
 	Type type = Type.T3D;
 	
 	protected Matrix4f matrix;
+	protected Vector3f velocity;
 	
 	// TESTING
 	protected Matrix4f translate = new Matrix4f();
@@ -36,6 +37,7 @@ public abstract class Transform {
 		this.type = type;
 		
 		matrix = new Matrix4f();
+		velocity = new Vector3f();
 		
 		// 2D
 		ry = 0;
@@ -46,6 +48,18 @@ public abstract class Transform {
 		
 		//ORBIT
 		
+	}
+	
+	public void update(){
+		translate(velocity.x, velocity.y, velocity.z);
+	}
+	
+	public void setVelocity(Vector3f velocity){
+		this.velocity = velocity;
+	}
+	
+	public Vector3f getVelocity(){
+		return velocity;
 	}
 	
 	public void translate(float x, float y, float z){

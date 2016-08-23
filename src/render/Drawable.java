@@ -28,6 +28,7 @@ public class Drawable extends Transform {
 	}
 	
 	public void update(Scene scene){
+		update();
 		/*shader.bind();
 		shader.setUniformMat4f("model", getMatrix());
 		shader.setUniformMat4f("view", cam.getLookAt());

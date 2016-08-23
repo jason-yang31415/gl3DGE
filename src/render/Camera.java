@@ -24,6 +24,7 @@ public class Camera extends Transform {
 	}
 	
 	public void update(){
+		super.update();
 		switch (mode){
 		case FIRST_PERSON:
 			/*translate = target.translate;

@@ -35,7 +35,7 @@ import java.nio.DoubleBuffer;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWvidmode;
+import org.lwjgl.glfw.GLFWVidMode;
 
 public class Window {
 
@@ -45,7 +45,7 @@ public class Window {
 	private GLFWKeyCallback keyCallback;
 	
 	public Window(int WIDTH, int HEIGHT, String title, boolean resizable, int version_major, int version_minor){
-		if (glfwInit() != GL_TRUE)
+		if (glfwInit() != true)
 			throw new IllegalStateException("Unable to initialize GLFW");
 		
 		glfwDefaultWindowHints();
@@ -61,11 +61,11 @@ public class Window {
 		if (id == NULL)
 			throw new RuntimeException("Failed to create GLFW window");
 		
-		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		
 		glfwSetWindowPos(id, 
-			(GLFWvidmode.width(vidmode) - WIDTH) / 2,
-			(GLFWvidmode.height(vidmode) - HEIGHT) / 2
+			(vidmode.width() - WIDTH) / 2,
+			(vidmode.height() - HEIGHT) / 2
 		);
 		
 		
@@ -84,11 +84,11 @@ public class Window {
 	}
 	
 	public void releaseErrorCallback(){
-		errorCallback.release();
+		glfwSetErrorCallback(null).free();
 	}
 	
-	public void releaseKeyCallback(){
-		keyCallback.release();
+	public void releaseCallbacks(){
+		keyCallback.free();
 	}
 	
 	public void destroyWindow(){
@@ -96,7 +96,7 @@ public class Window {
 	}
 	
 	public boolean shouldClose(){
-		return glfwWindowShouldClose(id) == GL_TRUE;
+		return glfwWindowShouldClose(id);
 	}
 	
 	public void swapBuffers(){

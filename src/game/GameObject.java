@@ -19,7 +19,6 @@ public class GameObject extends Drawable {
 	// RENDER
 	
 	// LOGIC
-	Vector3f v;
 	BoundingSphere bound;
 	
 	public static GameObject loadGameObject(String path, GameObjectShader gos) throws IOException {
@@ -100,7 +99,6 @@ public class GameObject extends Drawable {
 		goi.setMVP(new Matrix4f(), new Matrix4f(), projection);
 		
 		bound = new BoundingSphere(this, 1);
-		v = new Vector3f();
 	}
 	
 	public boolean collision(Transform t){
