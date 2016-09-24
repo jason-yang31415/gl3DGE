@@ -1,13 +1,19 @@
 package audio;
 
 import static org.lwjgl.openal.AL10.AL_BUFFER;
+import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;
+import static org.lwjgl.openal.AL10.AL_LOOPING;
 import static org.lwjgl.openal.AL10.AL_PITCH;
 import static org.lwjgl.openal.AL10.AL_POSITION;
+import static org.lwjgl.openal.AL10.AL_TRUE;
 import static org.lwjgl.openal.AL10.AL_VELOCITY;
 import static org.lwjgl.openal.AL10.alDeleteSources;
 import static org.lwjgl.openal.AL10.alGenSources;
 import static org.lwjgl.openal.AL10.alSource3f;
+import static org.lwjgl.openal.AL10.alSourcePause;
+import static org.lwjgl.openal.AL10.alSourcePlay;
+import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
 import static org.lwjgl.openal.AL10.alSourcei;
 import logic.Transform;
@@ -34,6 +40,18 @@ public class Source {
 		return id;
 	}
 	
+	public void play(){
+		alSourcePlay(id);
+	}
+	
+	public void pause(){
+		alSourcePause(id);
+	}
+	
+	public void stop(){
+		alSourceStop(id);
+	}
+	
 	public void delete(){
 		alDeleteSources(id);
 	}
@@ -53,6 +71,10 @@ public class Source {
 	
 	public void setGain(float gain){
 		alSourcef(id, AL_GAIN, gain);
+	}
+	
+	public void setLooping(boolean loop){
+		alSourcei(id, AL_LOOPING, (loop ? AL_TRUE : AL_FALSE));
 	}
 	
 	public void updateSource(){
