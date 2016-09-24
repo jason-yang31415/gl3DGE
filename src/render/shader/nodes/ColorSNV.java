@@ -1,18 +1,18 @@
-package render.shader;
+package render.shader.nodes;
 
 import util.Vector3f;
 
-public class NormalSNV extends ValueSNV {
+public class ColorSNV extends ValueSNV {
 
-	//Vector3f normal;
+	//Vector3f color;
 	
-	public NormalSNV(ShaderNode parent, String name) {
+	public ColorSNV(ShaderNode parent, String name) {
 		super(parent, name);
 		defineAsVector3f();
 	}
 	
-	public void setNormal(Vector3f normal){
-		defineAsVector3f(normal);
+	public void setColor(Vector3f color){
+		defineAsVector3f(color);
 	}
 	
 	/*public String getType(){
@@ -20,7 +20,7 @@ public class NormalSNV extends ValueSNV {
 	}
 	
 	public String getGLSL(){
-		return "vec3 " + getName() + " = vec3(" + normal.x + ", " + normal.y + ", " + normal.z + ");\n";
+		return "vec3 " + getName() + " = vec3(" + color.x + ", " + color.y + ", " + color.z + ");\n";
 	}
 
 	public String getAttribute() {

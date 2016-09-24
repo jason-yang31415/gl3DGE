@@ -1,4 +1,4 @@
-package render.shader;
+package render.shader.nodes;
 
 import util.Vector2f;
 import util.Vector3f;

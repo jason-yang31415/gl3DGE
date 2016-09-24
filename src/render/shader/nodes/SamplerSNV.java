@@ -1,4 +1,4 @@
-package render.shader;
+package render.shader.nodes;
 
 import render.SamplerMap;
 

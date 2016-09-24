@@ -1,4 +1,4 @@
-package render.shader;
+package render.shader.nodes;
 
 public class OutputSN extends ShaderNode {
 
@@ -24,7 +24,7 @@ public class OutputSN extends ShaderNode {
 	@Override
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("fragColor = vec4(" + inputs.get("in_value").getName() + ", 1);\n");
+		sb.append("fragColor = " + inputs.get("in_value").getName() + ";\n");
 		//sb.append("fragColor = vec4(1, 1, 1, 1);\n");
 		glsl = sb.toString();
 		return glsl;

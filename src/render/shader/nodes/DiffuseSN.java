@@ -1,4 +1,4 @@
-package render.shader;
+package render.shader.nodes;
 
 import java.util.HashMap;
 import java.util.Map;

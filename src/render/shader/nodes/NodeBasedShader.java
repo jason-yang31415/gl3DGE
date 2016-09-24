@@ -1,4 +1,4 @@
-package render.shader;
+package render.shader.nodes;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -29,6 +29,9 @@ import render.VertexArrayObject;
 import render.VertexBufferObject;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
+import render.shader.ObjectShader;
+import render.shader.Shader;
+import render.shader.ShaderProgram;
 import util.Vector3f;
 
 public class NodeBasedShader extends ObjectShader {
@@ -121,10 +124,10 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("}\n");
 		
 		String vertexSource = sb.toString();
-		System.out.println(vertexSource);
+		//System.out.println(vertexSource);
 		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
 		String fragmentSource = getFragmentSource();
-		System.out.println(fragmentSource);
+		//System.out.println(fragmentSource);
 		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
 		
 		loadVertexShader(vertexShader);
