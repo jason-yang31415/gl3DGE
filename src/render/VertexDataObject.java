@@ -16,15 +16,11 @@ import render.shader.ObjectShader;
 
 public class VertexDataObject {
 	
-	public VertexBufferObject vbo;
-	public VertexArrayObject vao;
-	public ElementBufferObject ebo;
+	private VertexBufferObject vbo;
+	private VertexArrayObject vao;
+	private ElementBufferObject ebo;
 	
-	public int count;
-	
-	public VertexDataObject(){
-		
-	}
+	private int count;
 	
 	public void loadVertexData(Mesh mesh, ObjectShader shader){
 		loadVAO();
@@ -61,6 +57,18 @@ public class VertexDataObject {
 		ebo.bufferData(indexBuffer, GL_STATIC_DRAW);
 		ebo.unbind();
 		vao.unbind();
+	}
+	
+	public VertexArrayObject getVAO(){
+		return vao;
+	}
+	
+	public VertexBufferObject getVBO(){
+		return vbo;
+	}
+	
+	public ElementBufferObject getEBO(){
+		return ebo;
 	}
 	
 	public void draw(ObjectShader os){

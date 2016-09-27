@@ -129,7 +129,11 @@ public class Text {
 				ArrayList<Integer> indices2 = new ArrayList(Arrays.asList(index_array2));
 				mesh.loadIndices(indices2);
 				
+				if (vdo.getVBO() != null)
+					vdo.getVBO().delete();
 				vdo.loadVBO(mesh, ts);
+				if (vdo.getEBO() != null)
+					vdo.getEBO().delete();
 				vdo.loadEBO(mesh);
 				
 				float ratio = 1;
