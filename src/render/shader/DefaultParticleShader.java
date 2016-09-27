@@ -70,7 +70,7 @@ public class DefaultParticleShader extends ParticleShader {
 	}
 
 	@Override
-	public void loadObjectData(Mesh mesh) {
+	public FloatBuffer getVertices(Mesh mesh) {
 		ArrayList<Float> vertex_data = new ArrayList<Float>();
 		for (Vertex v : mesh.getVertices()){
 			vertex_data.add(v.getPosition().x);
@@ -86,13 +86,14 @@ public class DefaultParticleShader extends ParticleShader {
 		FloatBuffer vertices = BufferUtils.createFloatBuffer(vertArray.length);
 		vertices.put(vertArray).flip();
 
-		int[] indexArray = new int[mesh.getIndices().size()];
+		/*int[] indexArray = new int[mesh.getIndices().size()];
 		for (int i = 0; i < mesh.getIndices().size(); i++) {
 			indexArray[i] = mesh.getIndices().get(i);
 		}
-
+		
 		loadVertices(vertices);
-		loadIndices(indexArray);
+		loadIndices(indexArray);*/
+		return vertices;
 	}
 
 	public void loadIndices(int[] indices) {
@@ -113,7 +114,7 @@ public class DefaultParticleShader extends ParticleShader {
 
 	@Override
 	public void init(){
-		count = indices.length;
+		/*count = indices.length;
 		
 		positionData = FloatBuffer.allocate(maxParticles * 4);
 		colorData = FloatBuffer.allocate(maxParticles * 4);
@@ -123,7 +124,7 @@ public class DefaultParticleShader extends ParticleShader {
 
 		/*
 		 * for (int i : indices){ System.out.println(i); }
-		 */
+		 
 
 		// create vao and vbo
 		vao = new VertexArrayObject();
@@ -131,13 +132,13 @@ public class DefaultParticleShader extends ParticleShader {
 
 		vbo = new VertexBufferObject();
 		vbo.bind(GL_ARRAY_BUFFER);
-		vbo.bufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+		vbo.bufferData(vertices, GL_STATIC_DRAW);
 		
 		int floatSize = 4; // TEMP; MOVE TO STATIC / CONST
 
 		ebo = glGenBuffers();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);*/
 
 		// create shader program
 		shader = new ShaderProgram();
@@ -146,15 +147,10 @@ public class DefaultParticleShader extends ParticleShader {
 		shader.bindFragDataLocation(0, "fragColor");
 		shader.link();
 		shader.bind();
-		
-		int vertex_position_particle = shader.getAttribLocation("vertex_position_particle");
-		shader.enableVertexAttribArray(vertex_position_particle);
-		vbo.bind(GL_ARRAY_BUFFER);
-		shader.vertexAttribPointer(vertex_position_particle, 3, 3 * floatSize, 0);
 
 		shader.unbind();
-		vbo.unbind(GL_ARRAY_BUFFER);
-		vao.unbind();
+	//	vbo.unbind(GL_ARRAY_BUFFER);
+	//	vao.unbind();
 	}
 
 	@Override
@@ -166,6 +162,27 @@ public class DefaultParticleShader extends ParticleShader {
 	}
 
 	@Override
+	public void setVBOPointers(VertexBufferObject vbo) {
+		int floatSize = 4;
+		int vertex_position_particle = shader.getAttribLocation("vertex_position_particle");
+		shader.enableVertexAttribArray(vertex_position_particle);
+		vbo.bind(GL_ARRAY_BUFFER);
+		shader.vertexAttribPointer(vertex_position_particle, 3, 3 * floatSize, 0);
+	}
+
+	@Override
+	public void bind() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unbind() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/*@Override
 	public void draw() {
 		vao.bind();
 		vbo.bind(GL_ARRAY_BUFFER);
@@ -187,6 +204,6 @@ public class DefaultParticleShader extends ParticleShader {
 		shader.unbind();
 		vbo.unbind(GL_ARRAY_BUFFER);
 		vao.unbind();
-	}
+	}*/
 	
 }

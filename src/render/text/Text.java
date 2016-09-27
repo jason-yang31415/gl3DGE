@@ -2,6 +2,7 @@ package render.text;
 
 import static org.lwjgl.stb.STBTruetype.stbtt_GetBakedQuad;
 import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -14,6 +15,7 @@ import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.system.MemoryStack;
 
 import render.Drawable;
+import render.VertexDataObject;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
 import render.shader.nodes.AlphaTestSN;
@@ -95,6 +97,8 @@ public class Text {
 			STBTTAlignedQuad q = STBTTAlignedQuad.mallocStack(stack);
 			
 			for ( int i = 0; i < text.length(); i++ ) {
+				double time = glfwGetTime();
+				
 				char c = text.charAt(i);
 				if ( c == '\n' ) {
 					y.put(0, y.get(0) + 24); //24 = font height
@@ -102,8 +106,11 @@ public class Text {
 					continue;
 				} else if ( c < 32 || 128 <= c )
 					continue;
+				
+				System.out.println("1 " + (glfwGetTime() - time));
 				stbtt_GetBakedQuad(ttf.getCData(), ttf.getBitmapWidth(), ttf.getBitmapHeight(), c - 32, x, y, q, true);
 				
+				System.out.println("2 " + (glfwGetTime() - time));
 				Mesh mesh = new Mesh();
 				ArrayList<Vertex> verts2 = new ArrayList<Vertex>();
 				
@@ -120,16 +127,22 @@ public class Text {
 				Integer[] index_array2 = { 3, 1, 0, 3, 2, 1 };
 				ArrayList<Integer> indices2 = new ArrayList(Arrays.asList(index_array2));
 				mesh.loadIndices(indices2);
+				System.out.println("3 " + (glfwGetTime() - time));
 				
-				ts.loadObjectData(mesh);
+				//ts.loadObjectData(mesh);
+				ts.init();
+				VertexDataObject vdo = new VertexDataObject();
+				vdo.loadVertexData(mesh, ts);
 				ts.check();
 				
 				float ratio = 1;
 				Matrix4f model = Matrix4f.scale(1 / 960f, 1 / 540f, 1).multiply(Matrix4f.translate(-0.5f, -0.5f, 0));
-				
-				Drawable t = new Drawable(ts);
+				System.out.println("4 " + (glfwGetTime() - time));
+				Drawable t = new Drawable(ts, vdo);
 				ts.setMVP(model, new Matrix4f(), new Matrix4f());
+				System.out.println("5 " + (glfwGetTime() - time));
 				t.draw();
+				System.out.println("6 " + (glfwGetTime() - time));
 			}
 		}
 	}

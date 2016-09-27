@@ -9,10 +9,12 @@ import logic.Transform;
 public class Drawable extends Transform {
 	
 	public ObjectShader os;
+	public VertexDataObject vdo;
 	
-	public Drawable(ObjectShader os){
+	public Drawable(ObjectShader os, VertexDataObject vdo){
 		this.os = os;
-		os.init();
+		this.vdo = vdo;
+		//os.init();
 	}
 	
 	/*public void translate(float x, float y, float z){
@@ -50,7 +52,7 @@ public class Drawable extends Transform {
 		shader.unbind();
 		vao.unbind();*/
 		setBlendFunc();
-		os.draw();
+		vdo.draw(os);
 	}
 	
 }

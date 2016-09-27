@@ -84,7 +84,7 @@ public class DefaultGameObjectShader extends GameObjectShader {
 		}
 	}
 
-	public void loadObjectData(Mesh mesh){
+	public FloatBuffer getVertices(Mesh mesh){
 		ArrayList<Float> vertex_data = new ArrayList<Float>();
 		for (Vertex v : mesh.getVertices()){
 			vertex_data.add(v.getPosition().x);
@@ -111,13 +111,14 @@ public class DefaultGameObjectShader extends GameObjectShader {
 		FloatBuffer vertices = BufferUtils.createFloatBuffer(vertArray.length);
 		vertices.put(vertArray).flip();
 
-		int[] indexArray = new int[mesh.getIndices().size()];
+		/*int[] indexArray = new int[mesh.getIndices().size()];
 		for (int i = 0; i < mesh.getIndices().size(); i++) {
 			indexArray[i] = mesh.getIndices().get(i);
 		}
 
 		loadVertices(vertices);
-		loadIndices(indexArray);
+		loadIndices(indexArray);*/
+		return vertices;
 	}
 
 	public void loadIndices(int[] indices) {
@@ -138,14 +139,10 @@ public class DefaultGameObjectShader extends GameObjectShader {
 
 	@Override
 	public void init() {
-		count = indices.length;
+		/*count = indices.length;
 
 		IntBuffer indexBuffer = BufferUtils.createIntBuffer(indices.length);
 		indexBuffer.put(indices).flip();
-
-		/*
-		 * for (int i : indices){ System.out.println(i); }
-		 */
 
 		// create vao and vbo
 		vao = new VertexArrayObject();
@@ -153,11 +150,11 @@ public class DefaultGameObjectShader extends GameObjectShader {
 
 		vbo = new VertexBufferObject();
 		vbo.bind(GL_ARRAY_BUFFER);
-		vbo.bufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+		vbo.bufferData(vertices, GL_STATIC_DRAW);
 
 		ebo = glGenBuffers();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);*/
 
 		// create shader program
 		shader = new ShaderProgram();
@@ -166,28 +163,6 @@ public class DefaultGameObjectShader extends GameObjectShader {
 		shader.bindFragDataLocation(0, "fragColor");
 		shader.link();
 		shader.bind();
-
-		int floatSize = 4;
-		int stride = 14;
-		int posAttrib = shader.getAttribLocation("position");
-		shader.enableVertexAttribArray(posAttrib);
-		shader.vertexAttribPointer(posAttrib, 3, stride * floatSize, 0);
-		int normalAttrib = shader.getAttribLocation("normal");
-		shader.enableVertexAttribArray(normalAttrib);
-		shader.vertexAttribPointer(normalAttrib, 3, stride * floatSize,
-				3 * floatSize);
-		int colorAttrib = shader.getAttribLocation("color");
-		shader.enableVertexAttribArray(colorAttrib);
-		shader.vertexAttribPointer(colorAttrib, 3, stride * floatSize,
-				6 * floatSize);
-		int specularColorAttrib = shader.getAttribLocation("specularColor");
-		shader.enableVertexAttribArray(specularColorAttrib);
-		shader.vertexAttribPointer(specularColorAttrib, 3, stride * floatSize,
-				9 * floatSize);
-		int texAttrib = shader.getAttribLocation("texcoord");
-		shader.enableVertexAttribArray(texAttrib);
-		shader.vertexAttribPointer(texAttrib, 2, stride * floatSize,
-				12 * floatSize);
 
 		shader.setUniform1i("tex", SamplerMap.TEX_DEFAULT);
 
@@ -212,8 +187,8 @@ public class DefaultGameObjectShader extends GameObjectShader {
 		shader.setUniform1i("enableEmission", enableEmission);
 
 		shader.unbind();
-		vbo.unbind(GL_ARRAY_BUFFER);
-		vao.unbind();
+		/*vbo.unbind(GL_ARRAY_BUFFER);
+		vao.unbind();*/
 	}
 
 	public void update(Scene scene, Drawable d) {
@@ -247,7 +222,7 @@ public class DefaultGameObjectShader extends GameObjectShader {
 		if (emission != null)
 			emission.unbind();
 	}
-
+/*
 	public void draw() {
 		vao.bind();
 		shader.bind();
@@ -256,6 +231,47 @@ public class DefaultGameObjectShader extends GameObjectShader {
 		unbindSamplerMaps();
 		shader.unbind();
 		vao.unbind();
+	}
+*/
+	@Override
+	public void setVBOPointers(VertexBufferObject vbo) {
+		vbo.bind(GL_ARRAY_BUFFER);
+		
+		int floatSize = 4;
+		int stride = 14;
+		int posAttrib = shader.getAttribLocation("position");
+		shader.enableVertexAttribArray(posAttrib);
+		shader.vertexAttribPointer(posAttrib, 3, stride * floatSize, 0);
+		int normalAttrib = shader.getAttribLocation("normal");
+		shader.enableVertexAttribArray(normalAttrib);
+		shader.vertexAttribPointer(normalAttrib, 3, stride * floatSize,
+				3 * floatSize);
+		int colorAttrib = shader.getAttribLocation("color");
+		shader.enableVertexAttribArray(colorAttrib);
+		shader.vertexAttribPointer(colorAttrib, 3, stride * floatSize,
+				6 * floatSize);
+		int specularColorAttrib = shader.getAttribLocation("specularColor");
+		shader.enableVertexAttribArray(specularColorAttrib);
+		shader.vertexAttribPointer(specularColorAttrib, 3, stride * floatSize,
+				9 * floatSize);
+		int texAttrib = shader.getAttribLocation("texcoord");
+		shader.enableVertexAttribArray(texAttrib);
+		shader.vertexAttribPointer(texAttrib, 2, stride * floatSize,
+				12 * floatSize);
+		
+		vbo.unbind(GL_ARRAY_BUFFER);
+	}
+
+	@Override
+	public void bind() {
+		shader.bind();
+		bindSamplerMaps();
+	}
+
+	@Override
+	public void unbind() {
+		unbindSamplerMaps();
+		shader.unbind();
 	}
 
 }

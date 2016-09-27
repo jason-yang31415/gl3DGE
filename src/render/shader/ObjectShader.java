@@ -11,13 +11,6 @@ import render.mesh.Mesh;
 import util.Matrix4f;
 
 public abstract class ObjectShader {
-
-	protected int count;
-	
-	protected FloatBuffer vertices;
-	
-	protected VertexArrayObject vao;
-	protected VertexBufferObject vbo;
 	
 	protected Shader vertexShader;
 	protected Shader fragmentShader;
@@ -40,13 +33,11 @@ public abstract class ObjectShader {
 		
 	}
 
-	public abstract void loadObjectData(Mesh mesh);
+	public abstract FloatBuffer getVertices(Mesh mesh);
 	
 	public abstract void loadShaders() throws IOException;
 	
-	public void loadVertices(FloatBuffer vertices){
-		this.vertices = vertices;
-	}
+	public abstract void setVBOPointers(VertexBufferObject vbo);
 	
 	public void loadVertexShader(Shader vertexShader){
 		this.vertexShader = vertexShader;
@@ -57,9 +48,8 @@ public abstract class ObjectShader {
 	}
 	
 	public boolean check(){
-		if (vertices == null || vertexShader == null || fragmentShader == null)
+		if (vertexShader == null || fragmentShader == null)
 			throw new RuntimeException("Failed to load Game Object: "
-					+ "\nVertices: " + vertices
 					+ "\nVertex shader: " + vertexShader
 					+ "\nFragment shader" + fragmentShader );
 		return true;
@@ -69,7 +59,9 @@ public abstract class ObjectShader {
 	
 	public abstract void update(Scene scene, Drawable d);
 	
-	public abstract void draw();
+	public abstract void bind();
+	
+	public abstract void unbind();
 
 	public void setMVP(Matrix4f model, Matrix4f view, Matrix4f projection) {
 		shader.bind();

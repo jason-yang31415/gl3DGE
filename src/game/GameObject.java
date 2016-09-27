@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 
 import logic.Transform;
 import render.Drawable;
+import render.VertexDataObject;
 import render.mesh.Mesh;
 import render.mesh.OBJLoader;
 import render.mesh.Resource;
@@ -51,20 +52,22 @@ public class GameObject extends Drawable {
 		}
 		reader.close();
 		
+		gos.loadShaders();
+		gos.check();
+		gos.init();
+		
+		VertexDataObject vdo = new VertexDataObject();
 		if (!obj.equals("")) {
 			// OBJLoader.loadGameObjectData(this, obj, smooth);
 			Mesh mesh = new Mesh();
 			OBJLoader.loadGameObjectData(mesh, obj, smooth);
 			
-			gos.loadObjectData(mesh);
+			//gos.loadObjectData(mesh);
+			vdo.loadVertexData(mesh, gos);
 		} else
 			throw new FileNotFoundException("Could not find obj file");
 		
-		gos.loadShaders();
-		
-		gos.check();
-		
-		return new GameObject(gos, radius);
+		return new GameObject(gos, vdo, radius);
 	}
 	
 	/*public static GameObject loadFromFloatArray(float[] verts, Shader vertexShader, Shader fragmentShader, Texture texture){
@@ -89,14 +92,14 @@ public class GameObject extends Drawable {
 		v = new Vector3f();
 	}*/
 	
-	public GameObject(GameObjectShader goi, float radius){
-		super(goi);
+	public GameObject(GameObjectShader gos, VertexDataObject vdo, float radius){
+		super(gos, vdo);
 		
 		// MVP
 		float ratio = 1;
 		Matrix4f projection = Matrix4f.perspective(90, ratio, 0.01f, 100);
 		//Matrix4f projection = Matrix4f.orthographic(-ratio, ratio, -1f, 1f, -1f, 1f);
-		goi.setMVP(new Matrix4f(), new Matrix4f(), projection);
+		gos.setMVP(new Matrix4f(), new Matrix4f(), projection);
 		
 		bound = new BoundingSphere(this, 1);
 	}

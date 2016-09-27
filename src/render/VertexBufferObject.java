@@ -1,6 +1,10 @@
 package render;
 
-import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
 
 import java.nio.FloatBuffer;
 
@@ -20,8 +24,8 @@ public class VertexBufferObject {
 		glBindBuffer(target, 0);
 	}
 	
-	public void bufferData(int target, FloatBuffer data, int usage){
-		glBufferData(target, data, usage);
+	public void bufferData(FloatBuffer data, int usage){
+		glBufferData(GL_ARRAY_BUFFER, data, usage);
 	}
 	
 	public void delete(){

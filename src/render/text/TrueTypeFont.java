@@ -36,9 +36,6 @@ public class TrueTypeFont {
 			ByteBuffer bitmap = BufferUtils.createByteBuffer(BITMAP_W * BITMAP_H);
 			stbtt_BakeFontBitmap(ttf, 24, bitmap, BITMAP_W, BITMAP_H, 32, cdata); //change values, 24 = font height
 			
-			for (int i = 0; i < 10000; i += 100)
-				System.out.println(bitmap.get(i));
-			
 			tex = new SamplerMap(BITMAP_W, BITMAP_H, SamplerMap.TEX_DEFAULT);
 			tex.texImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, BITMAP_W, BITMAP_H, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
 		} catch (IOException e) {

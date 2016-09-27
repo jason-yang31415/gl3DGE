@@ -11,6 +11,7 @@ import java.util.Random;
 import render.Camera;
 import render.Drawable;
 import render.Scene;
+import render.VertexDataObject;
 import render.mesh.Material;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
@@ -55,16 +56,19 @@ public class ParticleSystem extends Drawable {
 		ArrayList<Integer> indices = new ArrayList(Arrays.asList(index_array));
 		mesh.loadIndices(indices);
 		
-		ps.loadObjectData(mesh);
+		//ps.loadObjectData(mesh);
 		ps.loadShaders();
-		
 		ps.check();
+		ps.init();
 		
-		return new ParticleSystem(ps, maxParticles);
+		VertexDataObject vdo = new VertexDataObject();
+		vdo.loadVertexData(mesh, ps);
+		
+		return new ParticleSystem(ps, vdo, maxParticles);
 	}
 	
-	public ParticleSystem(ParticleShader ps, int maxParticles){
-		super(ps);
+	public ParticleSystem(ParticleShader ps, VertexDataObject vdo, int maxParticles){
+		super(ps, vdo);
 		
 		this.ps = ps; // TEMP?
 		this.maxParticles = maxParticles;

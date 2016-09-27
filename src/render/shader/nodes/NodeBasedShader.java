@@ -1,44 +1,28 @@
 package render.shader.nodes;
 
-import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+
+import java.io.IOException;
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 
 import render.Drawable;
 import render.SamplerMap;
 import render.Scene;
-import render.VertexArrayObject;
 import render.VertexBufferObject;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
 import render.shader.ObjectShader;
 import render.shader.Shader;
 import render.shader.ShaderProgram;
-import util.Vector3f;
 
 public class NodeBasedShader extends ObjectShader {
-	
-	int[] indices;
-
-	int ebo;
 	
 	Map<String, ShaderNodeValue> inputs = new LinkedHashMap<String, ShaderNodeValue>();
 	Map<String, ShaderNodeValue> uniforms = new LinkedHashMap<String, ShaderNodeValue>();
@@ -57,8 +41,7 @@ public class NodeBasedShader extends ObjectShader {
 		return id;
 	}
 	
-	@Override
-	public void loadObjectData(Mesh mesh) {
+	public FloatBuffer getVertices(Mesh mesh){
 		ArrayList<Float> vertex_data = new ArrayList<Float>();
 		for (Vertex v : mesh.getVertices()){
 			for (String key : inputs.keySet()){
@@ -92,17 +75,7 @@ public class NodeBasedShader extends ObjectShader {
 		FloatBuffer vertices = BufferUtils.createFloatBuffer(vertArray.length);
 		vertices.put(vertArray).flip();
 
-		int[] indexArray = new int[mesh.getIndices().size()];
-		for (int i = 0; i < mesh.getIndices().size(); i++) {
-			indexArray[i] = mesh.getIndices().get(i);
-		}
-
-		loadVertices(vertices);
-		loadIndices(indexArray);
-	}
-
-	public void loadIndices(int[] indices) {
-		this.indices = indices;
+		return vertices;
 	}
 
 	@Override
@@ -127,7 +100,7 @@ public class NodeBasedShader extends ObjectShader {
 		//System.out.println(vertexSource);
 		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
 		String fragmentSource = getFragmentSource();
-		//System.out.println(fragmentSource);
+		System.out.println(fragmentSource);
 		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
 		
 		loadVertexShader(vertexShader);
@@ -195,48 +168,23 @@ public class NodeBasedShader extends ObjectShader {
 
 	@Override
 	public void init() {
-		count = indices.length;
-
-		IntBuffer indexBuffer = BufferUtils.createIntBuffer(indices.length);
-		indexBuffer.put(indices).flip();
-
-		/*
-		 * for (int i : indices){ System.out.println(i); }
-		 */
-
-		// create vao and vbo
-		vao = new VertexArrayObject();
-		vao.bind();
-
-		vbo = new VertexBufferObject();
-		vbo.bind(GL_ARRAY_BUFFER);
-		vbo.bufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-
-		ebo = glGenBuffers();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
-
-		// create shader program
 		shader = new ShaderProgram();
 		shader.attachShader(vertexShader);
 		shader.attachShader(fragmentShader);
 		shader.bindFragDataLocation(0, "fragColor");
 		shader.link();
 		shader.bind();
-
+		
+		for (ShaderNodeValue snv : uniforms.values()){
+			if (snv instanceof SamplerSNV)
+				shader.setUniform1i(snv.getName(), ((SamplerSNV) snv).getSampler().getLocation());
+		}
+		shader.unbind();
+	}
+	
+	public void setVBOPointers(VertexBufferObject vbo){
+		vbo.bind(GL_ARRAY_BUFFER);
 		int floatSize = 4;
-		/*int stride = 9;
-		int posAttrib = shader.getAttribLocation("position");
-		shader.enableVertexAttribArray(posAttrib);
-		shader.vertexAttribPointer(posAttrib, 3, stride * floatSize, 0);
-		int normalAttrib = shader.getAttribLocation("normal");
-		shader.enableVertexAttribArray(normalAttrib);
-		shader.vertexAttribPointer(normalAttrib, 3, stride * floatSize,
-				3 * floatSize);
-		int colorAttrib = shader.getAttribLocation("in_color");
-		shader.enableVertexAttribArray(colorAttrib);
-		shader.vertexAttribPointer(colorAttrib, 3, stride * floatSize,
-				6 * floatSize);*/
 		int stride = 0;
 		for (ShaderNodeValue input : inputs.values())
 			stride += input.getSize();
@@ -248,15 +196,7 @@ public class NodeBasedShader extends ObjectShader {
 			shader.vertexAttribPointer(attrib, input.getSize(), stride * floatSize, offset * floatSize);
 			offset += input.getSize();
 		}
-		
-		for (ShaderNodeValue snv : uniforms.values()){
-			if (snv instanceof SamplerSNV)
-				shader.setUniform1i(snv.getName(), ((SamplerSNV) snv).getSampler().getLocation());
-		}
-		
-		shader.unbind();
 		vbo.unbind(GL_ARRAY_BUFFER);
-		vao.unbind();
 	}
 
 	@Override
@@ -269,25 +209,16 @@ public class NodeBasedShader extends ObjectShader {
 		shader.unbind();
 	}
 	
-	public void bindSamplers(){
+	public void bind(){
+		shader.bind();
 		for (SamplerMap sm : samplers)
 			sm.bind();
 	}
 	
-	public void unbindSamplers(){
+	public void unbind(){
 		for (SamplerMap sm : samplers)
 			sm.unbind();
-	}
-
-	@Override
-	public void draw() {
-		vao.bind();
-		shader.bind();
-		bindSamplers();
-		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
-		unbindSamplers();
 		shader.unbind();
-		vao.unbind();
 	}
-
+	
 }

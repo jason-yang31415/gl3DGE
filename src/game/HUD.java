@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import render.Drawable;
+import render.VertexDataObject;
 import render.mesh.Material;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
@@ -40,16 +41,19 @@ public class HUD extends Drawable {
 		goi.loadMeshAttribute("texture", texture_path);
 		goi.loadMeshAttribute("emission", texture_path);
 		
-		goi.loadObjectData(mesh);
+		//goi.loadObjectData(mesh);
 		goi.loadShaders();
-		
 		goi.check();
+		goi.init();
 		
-		return new HUD(goi, width, height);
+		VertexDataObject vdo = new VertexDataObject();
+		vdo.loadVertexData(mesh, goi);
+		
+		return new HUD(goi, vdo, width, height);
 	}
 	
-	public HUD(GameObjectShader goi, float width, float height) {
-		super(goi);
+	public HUD(GameObjectShader goi, VertexDataObject vdo, float width, float height) {
+		super(goi, vdo);
 		
 		// MVP
 		float ratio = 1;
