@@ -15,7 +15,7 @@ import render.mesh.Mesh;
 import render.shader.ObjectShader;
 
 public class VertexDataObject {
-
+	
 	public VertexBufferObject vbo;
 	public VertexArrayObject vao;
 	public ElementBufferObject ebo;
@@ -27,17 +27,28 @@ public class VertexDataObject {
 	}
 	
 	public void loadVertexData(Mesh mesh, ObjectShader shader){
-		FloatBuffer vertices = shader.getVertices(mesh);
-		
+		loadVAO();
+		loadVBO(mesh, shader);
+		loadEBO(mesh);
+	}
+	
+	public void loadVAO(){
 		vao = new VertexArrayObject();
+	}
+	
+	public void loadVBO(Mesh mesh, ObjectShader shader){
+		FloatBuffer vertices = shader.getVertices(mesh);
 		vao.bind();
-		
 		vbo = new VertexBufferObject();
 		vbo.bind(GL_ARRAY_BUFFER);
 		vbo.bufferData(vertices, GL_STATIC_DRAW);
 		shader.setVBOPointers(vbo);
 		vbo.unbind(GL_ARRAY_BUFFER);
-		
+		vao.unbind();
+	}
+	
+	public void loadEBO(Mesh mesh){
+		vao.bind();
 		int[] indices = new int[mesh.getIndices().size()];
 		for (int i = 0; i < mesh.getIndices().size(); i++) {
 			indices[i] = mesh.getIndices().get(i);
@@ -49,6 +60,7 @@ public class VertexDataObject {
 		ebo.bind();
 		ebo.bufferData(indexBuffer, GL_STATIC_DRAW);
 		ebo.unbind();
+		vao.unbind();
 	}
 	
 	public void draw(ObjectShader os){
