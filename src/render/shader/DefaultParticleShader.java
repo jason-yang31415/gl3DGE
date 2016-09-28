@@ -1,40 +1,19 @@
 package render.shader;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glBufferSubData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL31.glDrawArraysInstanced;
-import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
-import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
 import game.Particle;
 import io.FileLoader;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
 
 import render.Drawable;
 import render.Scene;
-import render.VertexArrayObject;
 import render.VertexBufferObject;
 import render.mesh.Mesh;
 import render.mesh.Resource;
@@ -45,12 +24,12 @@ public class DefaultParticleShader extends ParticleShader {
 	public FloatBuffer positionData; // TEMP MAKE GETTERS
 	public FloatBuffer colorData; // TEMP MAKE GETTERS
 	
-	int[] indices;
+	//int[] indices;
 	
-	VertexBufferObject position_vbo;
-	VertexBufferObject color_vbo;
+	//VertexBufferObject position_vbo;
+	//VertexBufferObject color_vbo;
 	
-	int ebo;
+	//int ebo;
 	
 	int maxParticles = 8; // TEMP
 	Particle[] particles;
@@ -96,9 +75,9 @@ public class DefaultParticleShader extends ParticleShader {
 		return vertices;
 	}
 
-	public void loadIndices(int[] indices) {
+	/*public void loadIndices(int[] indices) {
 		this.indices = indices;
-	}
+	}*/
 	
 	public void loadShaders() throws IOException {
 		String vertexSource = FileLoader.loadFile(Resource.DEFAULT_SHADER_DIR
@@ -163,23 +142,23 @@ public class DefaultParticleShader extends ParticleShader {
 
 	@Override
 	public void setVBOPointers(VertexBufferObject vbo) {
+		shader.bind();
 		int floatSize = 4;
 		int vertex_position_particle = shader.getAttribLocation("vertex_position_particle");
 		shader.enableVertexAttribArray(vertex_position_particle);
 		vbo.bind(GL_ARRAY_BUFFER);
 		shader.vertexAttribPointer(vertex_position_particle, 3, 3 * floatSize, 0);
+		shader.unbind();
 	}
 
 	@Override
 	public void bind() {
-		// TODO Auto-generated method stub
-		
+		shader.bind();
 	}
 
 	@Override
 	public void unbind() {
-		// TODO Auto-generated method stub
-		
+		shader.unbind();
 	}
 
 	/*@Override

@@ -71,6 +71,10 @@ public class VertexDataObject {
 		return ebo;
 	}
 	
+	public int getCount(){
+		return count;
+	}
+	
 	public void draw(ObjectShader os){
 		vao.bind();
 		ebo.bind();

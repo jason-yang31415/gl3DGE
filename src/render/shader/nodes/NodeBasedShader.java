@@ -183,6 +183,7 @@ public class NodeBasedShader extends ObjectShader {
 	}
 	
 	public void setVBOPointers(VertexBufferObject vbo){
+		shader.bind();
 		vbo.bind(GL_ARRAY_BUFFER);
 		int floatSize = 4;
 		int stride = 0;
@@ -197,6 +198,7 @@ public class NodeBasedShader extends ObjectShader {
 			offset += input.getSize();
 		}
 		vbo.unbind(GL_ARRAY_BUFFER);
+		shader.unbind();
 	}
 
 	@Override

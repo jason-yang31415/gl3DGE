@@ -1,7 +1,12 @@
 package game;
 
 import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +20,7 @@ import render.VertexDataObject;
 import render.mesh.Material;
 import render.mesh.Mesh;
 import render.mesh.Vertex;
-import render.shader.DefaultParticleShader;
+import render.shader.ObjectShader;
 import render.shader.ParticleShader;
 import util.Matrix4f;
 import util.Vector2f;
@@ -23,8 +28,6 @@ import util.Vector3f;
 import util.Vector4f;
 
 public class ParticleSystem extends Drawable {
-
-	ParticleShader ps;
 	
 	Particle[] particles;
 	int maxParticles;
@@ -35,9 +38,8 @@ public class ParticleSystem extends Drawable {
 	int counter = 0; // USE DELTA
 	int particleFrequency = 2;
 	
-	public static ParticleSystem loadParticleSystem(ParticleShader ps, Vector3f color, int maxParticles)
+	public static ParticleSystem loadParticleSystem(ObjectShader ps, Vector3f color, int maxParticles)
 			throws IOException {
-		ps.setMaxParticles(maxParticles);
 		
 		Mesh mesh = new Mesh();
 		
@@ -46,10 +48,10 @@ public class ParticleSystem extends Drawable {
 		material.setDiffuse(color);
 		material.setSpecular(new Vector3f(0, 0, 0));
 		
-		verts.add(new Vertex(new Vector3f(-1, -1, 0), new Vector3f(0, 0, -1), material, new Vector2f(1, 1)));
-		verts.add(new Vertex(new Vector3f(1, -1, 0), new Vector3f(0, 0, -1), material, new Vector2f(-1, 1)));
-		verts.add(new Vertex(new Vector3f(1, 1, 0), new Vector3f(0, 0, -1), material, new Vector2f(-1, -1)));
-		verts.add(new Vertex(new Vector3f(-1, 1, 0), new Vector3f(0, 0, -1), material, new Vector2f(1, -1)));
+		verts.add(new Vertex(new Vector3f(-1, -1, 0), null, material, new Vector2f(1, 1)));
+		verts.add(new Vertex(new Vector3f(1, -1, 0), null, material, new Vector2f(-1, 1)));
+		verts.add(new Vertex(new Vector3f(1, 1, 0), null, material, new Vector2f(-1, -1)));
+		verts.add(new Vertex(new Vector3f(-1, 1, 0), null, material, new Vector2f(1, -1)));
 		mesh.loadVertices(verts);
 		
 		Integer[] index_array = {3, 1, 0, 3, 2, 1};
@@ -67,10 +69,9 @@ public class ParticleSystem extends Drawable {
 		return new ParticleSystem(ps, vdo, maxParticles);
 	}
 	
-	public ParticleSystem(ParticleShader ps, VertexDataObject vdo, int maxParticles){
+	public ParticleSystem(ObjectShader ps, VertexDataObject vdo, int maxParticles){
 		super(ps, vdo);
 		
-		this.ps = ps; // TEMP?
 		this.maxParticles = maxParticles;
 		
 		particles = new Particle[maxParticles];
@@ -86,12 +87,12 @@ public class ParticleSystem extends Drawable {
 		
 		Random rand = new Random();
 		Vector3f position = new Vector3f(0, 0, 0); // TEMP
-		Vector3f velocity = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()).subtract(new Vector3f(0.5f, 0.5f, 0.5f)).scale(0.1f);
+		Vector3f velocity = new Vector3f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()).subtract(new Vector3f(0.5f, 0.5f, 0.5f)).scale(0.2f);
 		Vector4f color = new Vector4f(rand.nextFloat(), rand.nextFloat(), rand.nextFloat(), 1);
 		float lifespan = 100;
 		float size = rand.nextFloat() / 4 + 0.25f;
 		
-		Particle particle = new Particle(ps, position, velocity, color, size, lifespan);
+		Particle particle = new Particle(os, position, velocity, color, size, lifespan);
 		particles[index] = particle;
 		
 		if (particleCount < maxParticles)
@@ -143,12 +144,14 @@ public class ParticleSystem extends Drawable {
 		Vector3f camera_up = new Vector3f(view.m01, view.m11, view.m21);
 		Vector3f camera_forward = getPos().subtract(cam.getPos()).normalize();
 		Vector3f camera_right = camera_up.cross(camera_forward);
-		rotate = new Matrix4f(
-			new Vector4f(camera_right.x, camera_right.y, camera_right.z, 0),
-			new Vector4f(camera_up.x, camera_up.y, camera_up.z, 0),
-			new Vector4f(camera_forward.x, camera_forward.y, camera_forward.z, 0),
-			new Vector4f(0, 0, 0, 1)
-		);
+		if (!Float.isNaN(camera_forward.x) && !Float.isNaN(camera_forward.y) && !Float.isNaN(camera_forward.z)){
+			rotate = new Matrix4f(
+					new Vector4f(camera_right.x, camera_right.y, camera_right.z, 0),
+					new Vector4f(camera_up.x, camera_up.y, camera_up.z, 0),
+					new Vector4f(camera_forward.x, camera_forward.y, camera_forward.z, 0),
+					new Vector4f(0, 0, 0, 1)
+				);
+		}
 		
 		for (int i = 0; i < particleCount; i++){
 			Particle p = particles[i];
@@ -158,9 +161,36 @@ public class ParticleSystem extends Drawable {
 		if (counter > particleFrequency){
 			counter = 0;
 			create();
-			ps.setParticles(particles);
+			//ps.setParticles(particles);
 		}
 		counter++;
+	}
+	
+	@Override
+	public void draw() {
+		setBlendFunc();
+		
+		vdo.getVAO().bind();
+		vdo.getEBO().bind();
+		os.bind();
+		
+		//glDisable(GL_DEPTH_TEST);
+		glDepthMask(false);
+		
+		for (Particle p : particles){
+			if (p != null){
+				p.uniform(os.getShader());
+				glDrawElements(GL_TRIANGLES, vdo.getCount(), GL_UNSIGNED_INT, 0);
+			}
+		}
+		//glDrawElements(GL_TRIANGLES, vdo.getCount(), GL_UNSIGNED_INT, 0);
+		
+		glDepthMask(true);
+		//glEnable(GL_DEPTH_TEST);
+		
+		os.unbind();
+		vdo.getEBO().unbind();
+		vdo.getVAO().unbind();
 	}
 	
 }

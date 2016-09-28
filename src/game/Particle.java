@@ -1,5 +1,6 @@
 package game;
 
+import render.shader.ObjectShader;
 import render.shader.ParticleShader;
 import render.shader.ShaderProgram;
 import util.Vector3f;
@@ -7,7 +8,7 @@ import util.Vector4f;
 
 public class Particle {
 
-	ParticleShader ps;
+	ObjectShader ps;
 	
 	Vector3f position;
 	Vector3f velocity;
@@ -15,7 +16,7 @@ public class Particle {
 	float size, angle, weight;
 	float t, lifespan;
 	
-	public Particle(ParticleShader ps, Vector3f position, Vector3f velocity, Vector4f color, float size, float lifespan){
+	public Particle(ObjectShader ps, Vector3f position, Vector3f velocity, Vector4f color, float size, float lifespan){
 		this.ps = ps;
 		
 		this.position = position;
