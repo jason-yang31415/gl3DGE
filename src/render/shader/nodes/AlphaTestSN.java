@@ -18,7 +18,7 @@ public class AlphaTestSN extends ShaderNode {
 	
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("if (" + inputs.get("in_value").getName() + ".a <= 0.0){\n");
+		sb.append("if (" + inputs.get("in_value").getName() + " <= 0.0){\n");
 		sb.append("  discard;\n");
 		sb.append("}\n");
 		glsl = sb.toString();

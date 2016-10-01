@@ -176,7 +176,7 @@ public class DefaultGameObjectShader extends GameObjectShader {
 
 		shader.setUniform1f("specularity", specularity);
 
-		shader.setUniform1i("bump", SamplerMap.BUMP_DEFAULT);
+		shader.setUniform1i("bump", SamplerMap.NORMAL_DEFAULT);
 
 		int enableBump = ((bump != null) ? 1 : 0);
 		shader.setUniform1i("enableBump", enableBump);

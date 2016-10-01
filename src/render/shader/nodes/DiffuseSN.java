@@ -21,7 +21,7 @@ public class DiffuseSN extends ShaderNode {
 		inputs.put("in_color", color);
 	}
 	
-	public void setInNormal(NormalSNV normal){
+	public void setInNormal(ValueSNV normal){
 		inputs.put("in_normal", normal);
 	}
 	

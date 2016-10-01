@@ -31,7 +31,7 @@ public class SamplerMap {
 
 	public static int TEX_DEFAULT = 0;
 	public static int SPEC_DEFAULT = 1;
-	public static int BUMP_DEFAULT = 2;
+	public static int NORMAL_DEFAULT = 2;
 	public static int EMISSION_DEFAULT = 3;
 	
 	public final int id;

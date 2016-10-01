@@ -39,7 +39,7 @@ public class FramebufferObject {
 	private SamplerMap texture;
 	private SamplerMap depth;
 	
-	public FramebufferObject(int width, int height){
+	public FramebufferObject(int width, int height, int location){
 		WIDTH = width;
 		HEIGHT = height;
 		
@@ -50,9 +50,9 @@ public class FramebufferObject {
 		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, WIDTH, HEIGHT);
 		
-		texture = new SamplerMap(WIDTH, HEIGHT, 4);
+		texture = new SamplerMap(WIDTH, HEIGHT, location);
 		texture.texImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, ByteBuffer.allocate(1024));
-		depth = new SamplerMap(WIDTH, HEIGHT, 5);
+		depth = new SamplerMap(WIDTH, HEIGHT, location + 1);
 		depth.texImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 		
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);

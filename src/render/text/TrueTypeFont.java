@@ -73,13 +73,13 @@ public class TrueTypeFont {
 		ts.addNode(texSampler2);
 		
 		AlphaTestSN at = new AlphaTestSN(ts);
-		at.setInValue(texSampler2.getOutColor4f());
+		at.setInValue(texSampler2.getOutAlpha());
 		ts.addNode(at);
 		
 		/*ValueSNV color = new ValueSNV(null, "color");
 		color.defineAsVector3f(new Vector3f(1, 1, 1));
 		ts.addConstant(color);*/
-		ts.getOutputNode().setInValue(texSampler2.getOutColor4f());
+		ts.getOutputNode().setInColor(texSampler2.getOutColor());
 		
 		try {
 			ts.loadShaders();

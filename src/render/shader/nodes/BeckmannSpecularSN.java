@@ -18,7 +18,7 @@ public class BeckmannSpecularSN extends ShaderNode {
 		inputs.put("in_roughness", roughness);
 	}
 
-	public void setInNormal(NormalSNV normal){
+	public void setInNormal(ValueSNV normal){
 		inputs.put("in_normal", normal);
 	}
 	
