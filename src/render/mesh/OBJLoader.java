@@ -182,7 +182,7 @@ public class OBJLoader {
 	public static void checkIndex(ArrayList<Vertex> verts, ArrayList<Integer> i, Vertex vert){
 		int index = -1;
 		for (Vertex v : verts){
-			if (isSimilar3f(vert.position, v.position) /*&& isSimilar3f(vert.normal, v.normal)*/){
+			if (isSimilar(vert, v) /*&& isSimilar3f(vert.normal, v.normal)*/){
 				index = verts.indexOf(v);
 			}
 		}
@@ -199,13 +199,25 @@ public class OBJLoader {
 		}
 	}
 	
-	public static boolean isSimilar3f(Vector3f a, Vector3f b){
-		float x = Math.abs(a.x - b.x);
-		float y = Math.abs(a.y - b.y);
-		float z = Math.abs(a.z - b.z);
-		if (x < 0.01 && y < 0.01 && z < 0.01)
-			return true;
-		return false;
+	public static boolean isSimilar(Vertex a, Vertex b){
+		Vector3f posA = a.getPosition();
+		Vector3f posB = b.getPosition();
+		float posX = Math.abs(posA.x - posB.x);
+		float posY = Math.abs(posA.y - posB.y);
+		float posZ = Math.abs(posA.z - posB.z);
+		if (!(posX < 0.01 && posY < 0.01 && posZ < 0.01))
+			return false;
+		
+		if (a.getTextureCoordinate() != null && b.getTextureCoordinate() != null){
+			Vector2f texA = a.getTextureCoordinate();
+			Vector2f texB = b.getTextureCoordinate();
+			float texX = Math.abs(texA.x - texB.x);
+			float texY = Math.abs(texA.y - texB.y);
+			if (!(texX < 0.01 && texY < 0.01))
+				return false;
+				
+		}
+		return true;
 	}
 	
 }
