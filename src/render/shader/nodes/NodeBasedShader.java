@@ -3,6 +3,7 @@ package render.shader.nodes;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import io.FileLoader;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -13,10 +14,12 @@ import java.util.Map;
 import org.lwjgl.BufferUtils;
 
 import render.Drawable;
+import render.SamplerCube;
 import render.SamplerMap;
 import render.Scene;
 import render.VertexBufferObject;
 import render.mesh.Mesh;
+import render.mesh.Resource;
 import render.mesh.Vertex;
 import render.shader.ObjectShader;
 import render.shader.Shader;
@@ -28,10 +31,12 @@ public class NodeBasedShader extends ObjectShader {
 	Map<String, ShaderNodeValue> uniforms = new LinkedHashMap<String, ShaderNodeValue>();
 	ArrayList<ShaderNodeValue> constants = new ArrayList<ShaderNodeValue>();
 	ArrayList<ShaderNode> nodes = new ArrayList<ShaderNode>();
+	ArrayList<String> functions = new ArrayList<String>();
 	InputSN in = new InputSN(this);
 	OutputSN out = new OutputSN(this);
 	
 	ArrayList<SamplerMap> samplers = new ArrayList<SamplerMap>();
+	ArrayList<SamplerCube> samplerCubes = new ArrayList<SamplerCube>();
 	
 	int currentId = 0;
 	
@@ -91,13 +96,14 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("uniform mat4 projection;\n");
 		sb.append("void main(){\n");
 		for (ShaderNodeValue input : inputs.values())
-			sb.append(input.getVertexGLSL());
+			//sb.append(input.getVertexGLSL());
+			sb.append(input.getVarying() + " = " + input.getAttribute() + ";\n");
 		sb.append("mat4 mvp = projection * view * model;\n");
 		sb.append("gl_Position = mvp * vec4(in_" + inputs.get(ShaderNodeValue.INPUT_POSITION).getName() + ", 1.0);\n");
 		sb.append("}\n");
 		
 		String vertexSource = sb.toString();
-		//System.out.println(vertexSource);
+		System.out.println(vertexSource);
 		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
 		String fragmentSource = getFragmentSource();
 		System.out.println(fragmentSource);
@@ -121,6 +127,7 @@ public class NodeBasedShader extends ObjectShader {
 		//sb.append("uniform vec3 lightPos;\n");
 		sb.append("void main() {\n");
 		//sb.append("	vec3 global_lightPos = lightPos;\n");
+		sb.append("vec3 " + getInputNode().getOutWorldPosition().getName() + " = (model * vec4(" + getInputNode().getOutPosition().getName() + ", 1)).xyz;\n");
 		for (ShaderNodeValue snv : constants){
 			sb.append(snv.getGLSL());
 		}
@@ -129,6 +136,9 @@ public class NodeBasedShader extends ObjectShader {
 		}
 		sb.append(out.getGLSL());
 		sb.append("}\n");
+		for (String function : functions){
+			sb.append(function);
+		}
 		sb.append("\n");
 		
 		return sb.toString();
@@ -152,6 +162,18 @@ public class NodeBasedShader extends ObjectShader {
 	
 	public void addSampler(SamplerMap sampler){
 		samplers.add(sampler);
+	}
+	
+	public void addSamplerCube(SamplerCube samplerCube){
+		samplerCubes.add(samplerCube);
+	}
+	
+	public void addFunction(String function){
+		functions.add(function);
+	}
+	
+	public void addFunctionFromFile(String path) throws IOException{
+		addFunction(FileLoader.loadFile(Resource.SHADER_DIR + path));
 	}
 	
 	public InputSN getInputNode(){
@@ -178,6 +200,8 @@ public class NodeBasedShader extends ObjectShader {
 		for (ShaderNodeValue snv : uniforms.values()){
 			if (snv instanceof SamplerSNV)
 				shader.setUniform1i(snv.getName(), ((SamplerSNV) snv).getSampler().getLocation());
+			else if (snv instanceof SamplerCubeSNV)
+				shader.setUniform1i(snv.getName(), ((SamplerCubeSNV) snv).getSamplerCube().getLocation());
 		}
 		shader.unbind();
 	}
@@ -215,11 +239,15 @@ public class NodeBasedShader extends ObjectShader {
 		shader.bind();
 		for (SamplerMap sm : samplers)
 			sm.bind();
+		for (SamplerCube sc : samplerCubes)
+			sc.bind();
 	}
 	
 	public void unbind(){
 		for (SamplerMap sm : samplers)
 			sm.unbind();
+		for (SamplerCube sc : samplerCubes)
+			sc.unbind();
 		shader.unbind();
 	}
 	

@@ -46,13 +46,22 @@ public class SamplerMap {
 		this.width = width;
 		this.height = height;
 		
-		bindActiveTexture();
-		glBindTexture(GL_TEXTURE_2D, id);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		unbindActiveTexture();
+		setTextureWrap(GL_REPEAT);
+		setTextureFilter(GL_LINEAR);
+	}
+	
+	public void setTextureWrap(int wrap){
+		bind();
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+		unbind();
+	}
+	
+	public void setTextureFilter(int filter){
+		bind();
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+		unbind();
 	}
 	
 	public void texImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, ByteBuffer pixels){
@@ -119,30 +128,10 @@ public class SamplerMap {
 		if (image == null)
 			throw new RuntimeException("Texture screwed up :(");
 		
-		AffineTransform transform = AffineTransform.getScaleInstance(1f, -1f);
-		transform.translate(0, -image.getHeight());
-		AffineTransformOp operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-		image = operation.filter(image, null);
-		
 		int width = image.getWidth();
 		int height = image.getHeight();
-
-		int[] pixels = new int[width * height];
-		image.getRGB(0, 0, width, height, pixels, 0, width);
 		
-		ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * 4);
-
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				int pixel = pixels[y * width + x];
-				
-				buffer.put((byte) ((pixel >> 16) & 0xFF));
-				buffer.put((byte) ((pixel >> 8) & 0xFF));
-				buffer.put((byte) (pixel & 0xFF));
-				buffer.put((byte) ((pixel >> 24) & 0xFF));
-			}
-		}
-		buffer.flip();
+		ByteBuffer buffer = ImageLoader.loadImageBuffer(image);
 		
 		SamplerMap samplerMap = new SamplerMap(width, height, location);
 		

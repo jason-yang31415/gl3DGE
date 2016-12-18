@@ -18,6 +18,7 @@ public class Transform {
 	// TESTING
 	protected Matrix4f translate = new Matrix4f();
 	protected Matrix4f rotate = new Matrix4f();
+	protected Matrix4f scale = new Matrix4f();
 	
 	// 2D
 	float ry;
@@ -116,6 +117,10 @@ public class Transform {
 		}
 	}
 	
+	public void scale(float x, float y, float z){
+		scale = Matrix4f.scale(x, y, z);
+	}
+	
 	public void setTransformMode(Type type){
 		this.type = type;
 	}
@@ -138,7 +143,7 @@ public class Transform {
 		default:
 			return matrix;
 		}*/
-		matrix = translate.multiply(rotate);
+		matrix = translate.multiply(rotate).multiply(scale);
 		return matrix;
 	}
 	

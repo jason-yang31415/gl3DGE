@@ -29,7 +29,7 @@ public class FresnelSN extends ShaderNode {
 	@Override
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("vec3 " + variable("E") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName() + " - " + nbs.getInputNode().getOutPosition().getName() + ");\n");
+		sb.append("vec3 " + variable("E") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName() + " - " + nbs.getInputNode().getOutWorldPosition().getName() + ");\n");
 		sb.append("float " + variable("cos") + " = dot(normalize(" + inputs.get("in_normal").getName() + "), " + variable("E") + ");\n");
 		sb.append("float " + variable("r0") + " = pow((1 - " + inputs.get("in_ior").getName() + ") / (1 + " + inputs.get("in_ior").getName() + "), 2);\n");
 		sb.append("float " + outputs.get("out_R").getName() + " = " + variable("r0") + " + (1 - " + variable("r0") + ") * pow(1 - " + variable("cos") + ", 5);\n");

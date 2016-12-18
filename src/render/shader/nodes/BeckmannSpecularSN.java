@@ -28,8 +28,8 @@ public class BeckmannSpecularSN extends ShaderNode {
 	
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("vec3 " + variable("L") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName() + " - " + nbs.getInputNode().getOutPosition().getName() + ");\n");
-		sb.append("vec3 " + variable("E") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName() + " - " + nbs.getInputNode().getOutPosition().getName() + ");\n");
+		sb.append("vec3 " + variable("L") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName() + " - " + nbs.getInputNode().getOutWorldPosition().getName() + ");\n");
+		sb.append("vec3 " + variable("E") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName() + " - " + nbs.getInputNode().getOutWorldPosition().getName() + ");\n");
 		sb.append("vec3 " + variable("H") + " = normalize(" + variable("L") + " + " + variable("E") + ");\n");
 		sb.append("float " + variable("cos") + " = dot(" + inputs.get("in_normal").getName() + ", " + variable("H") + ");\n");
 		sb.append("float " + variable("e") + " = 2.71828183;\n");

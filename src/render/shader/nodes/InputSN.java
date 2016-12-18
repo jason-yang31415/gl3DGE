@@ -10,6 +10,7 @@ public class InputSN extends ShaderNode{
 	
 	public void init(){
 		outputs.put(ShaderNodeValue.INPUT_POSITION, new PositionSNV(this, ShaderNodeValue.INPUT_POSITION));
+		outputs.put(ShaderNodeValue.INPUT_WORLD_POSITION, new PositionSNV(this, ShaderNodeValue.INPUT_WORLD_POSITION));
 		outputs.put(ShaderNodeValue.INPUT_NORMAL, new NormalSNV(this, ShaderNodeValue.INPUT_NORMAL));
 		outputs.put(ShaderNodeValue.INPUT_COLOR, new ColorSNV(this, ShaderNodeValue.INPUT_COLOR));
 		outputs.put(ShaderNodeValue.INPUT_TEXTURE_COORDINATE, new TextureCoordinateSNV(this, ShaderNodeValue.INPUT_TEXTURE_COORDINATE));
@@ -17,6 +18,10 @@ public class InputSN extends ShaderNode{
 	
 	public PositionSNV getOutPosition(){
 		return (PositionSNV) outputs.get(ShaderNodeValue.INPUT_POSITION);
+	}
+	
+	public PositionSNV getOutWorldPosition(){
+		return (PositionSNV) outputs.get(ShaderNodeValue.INPUT_WORLD_POSITION);
 	}
 	
 	public NormalSNV getOutNormal(){

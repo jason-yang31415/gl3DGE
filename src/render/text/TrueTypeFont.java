@@ -16,6 +16,7 @@ import org.lwjgl.stb.STBTTBakedChar;
 
 import render.SamplerMap;
 import render.VertexDataObject;
+import render.mesh.Resource;
 import render.shader.nodes.AlphaTestSN;
 import render.shader.nodes.NodeBasedShader;
 import render.shader.nodes.SamplerSN;
@@ -39,7 +40,7 @@ public class TrueTypeFont {
 		
 		cdata = STBTTBakedChar.malloc(96);
 		try {
-			ByteBuffer ttf = IOUtil.ioResourceToByteBuffer(path, 160 * 1024);
+			ByteBuffer ttf = IOUtil.ioResourceToByteBuffer(Resource.FONT_DIR + path, 160 * 1024);
 			
 			ByteBuffer bitmap = BufferUtils.createByteBuffer(BITMAP_SIZE * BITMAP_SIZE);
 			stbtt_BakeFontBitmap(ttf, fontSize, bitmap, BITMAP_SIZE, BITMAP_SIZE, 32, cdata);

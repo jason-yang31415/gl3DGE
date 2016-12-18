@@ -31,7 +31,6 @@ public class OBJLoader {
 		//FloatBuffer vertices = BufferUtils.createFloatBuffer(2048);
 		//ArrayList<Float> verts_float = new ArrayList<Float>();
 		//int count = 0;
-		
 		InputStream is = OBJLoader.class.getResourceAsStream(Resource.OBJ_DIR + objPath);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 		

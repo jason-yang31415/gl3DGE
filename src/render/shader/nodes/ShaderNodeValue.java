@@ -3,6 +3,7 @@ package render.shader.nodes;
 public abstract class ShaderNodeValue {
 	
 	public static String INPUT_POSITION = "position";
+	public static String INPUT_WORLD_POSITION = "world_position";
 	public static String INPUT_NORMAL = "normal";
 	public static String INPUT_COLOR = "color";
 	public static String INPUT_TEXTURE_COORDINATE = "texture_coordinate";
