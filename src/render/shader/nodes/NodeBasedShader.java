@@ -125,6 +125,12 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("uniform mat4 view;\n");
 		sb.append("uniform mat4 projection;\n");
 		//sb.append("uniform vec3 lightPos;\n");
+		sb.append("\n");
+		for (String function : functions){
+			sb.append(function);
+		}
+		sb.append("\n");
+		
 		sb.append("void main() {\n");
 		//sb.append("	vec3 global_lightPos = lightPos;\n");
 		sb.append("vec3 " + getInputNode().getOutWorldPosition().getName() + " = (model * vec4(" + getInputNode().getOutPosition().getName() + ", 1)).xyz;\n");
@@ -136,9 +142,6 @@ public class NodeBasedShader extends ObjectShader {
 		}
 		sb.append(out.getGLSL());
 		sb.append("}\n");
-		for (String function : functions){
-			sb.append(function);
-		}
 		sb.append("\n");
 		
 		return sb.toString();

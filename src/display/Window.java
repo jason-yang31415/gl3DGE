@@ -33,13 +33,18 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 
 public class Window {
 
 	final long id;
+	
+	private int WIDTH;
+	private int HEIGHT;
 	
 	private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
@@ -47,6 +52,9 @@ public class Window {
 	public Window(int WIDTH, int HEIGHT, String title, boolean resizable, int version_major, int version_minor){
 		if (glfwInit() != true)
 			throw new IllegalStateException("Unable to initialize GLFW");
+		
+		this.WIDTH = WIDTH;
+		this.HEIGHT = HEIGHT;
 		
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -67,12 +75,37 @@ public class Window {
 			(vidmode.width() - WIDTH) / 2,
 			(vidmode.height() - HEIGHT) / 2
 		);
-		
+
+		GLFW.glfwSetWindowSizeCallback(id, new GLFWWindowSizeCallbackI(){
+
+			@Override
+			public void invoke(long window, int width, int height) {
+				setSize(width, height);
+			}
+			
+		});
 		
 		glfwMakeContextCurrent(id);
 		glfwSwapInterval(1);
 		
 		glfwShowWindow(id);
+	}
+	
+	public long getID(){
+		return id;
+	}
+	
+	public void setSize(int WIDTH, int HEIGHT){
+		this.WIDTH = WIDTH;
+		this.HEIGHT = HEIGHT;
+	}
+	
+	public int getWidth(){
+		return WIDTH;
+	}
+	
+	public int getHeight(){
+		return HEIGHT;
 	}
 	
 	public void setErrorCallback(GLFWErrorCallback ecb){

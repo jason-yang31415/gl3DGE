@@ -39,7 +39,7 @@ public class NormalMapConverterSN extends ShaderNode {
 	@Override
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("vec3 " + outputs.get("out_normal").getName() + " = normalize(mat3(model) * (texture(" + inputs.get("in_sampler").getName() + ", " + inputs.get("in_texturecoordinate").getName() + "))");
+		sb.append("vec3 " + outputs.get("out_normal").getName() + " = normalize(texture(" + inputs.get("in_sampler").getName() + ", " + inputs.get("in_texturecoordinate").getName() + ")");
 		switch (mode){
 		case XYZ:
 			sb.append(".xyz");
@@ -48,7 +48,7 @@ public class NormalMapConverterSN extends ShaderNode {
 			sb.append(".xzy");
 			break;
 		}
-		sb.append(" * 2 - 1);\n");
+		sb.append(" * 2 - 1) * mat3(model);\n");
 		glsl = sb.toString();
 		return glsl;
 	}

@@ -35,13 +35,15 @@ public class FramebufferObject {
 	private final int rbo;
 	
 	private int WIDTH, HEIGHT;
+	private int location;
 	
 	private SamplerMap texture;
 	private SamplerMap depth;
 	
-	public FramebufferObject(int width, int height, int location){
-		WIDTH = width;
-		HEIGHT = height;
+	public FramebufferObject(int WIDTH, int HEIGHT, int location){
+		this.WIDTH = WIDTH;
+		this.HEIGHT = HEIGHT;
+		this.location = location;
 		
 		id = glGenFramebuffers();
 		glBindFramebuffer(GL_FRAMEBUFFER, id);
@@ -67,6 +69,32 @@ public class FramebufferObject {
 		
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+	
+	public void update(int WIDTH, int HEIGHT){
+		this.WIDTH = WIDTH;
+		this.HEIGHT = HEIGHT;
+		
+		bind();
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, WIDTH, HEIGHT);
+		
+		texture.setWidth(WIDTH);
+		texture.setHeight(HEIGHT);
+		texture.texImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, ByteBuffer.allocate(1024));
+		depth.setWidth(WIDTH);
+		depth.setHeight(HEIGHT);
+		depth.texImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.getID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth.getID(), 0);
+		
+		int error = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (error != GL_FRAMEBUFFER_COMPLETE)
+			throw new RuntimeException(String.format("%d", error));
+		
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		unbind();
 	}
 	
 	public void bind(){
