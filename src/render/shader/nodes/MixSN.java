@@ -51,9 +51,9 @@ public class MixSN extends ShaderNode {
 		StringBuilder sb = new StringBuilder();
 		switch (blend){
 		case MIX:
-			sb.append(((ValueSNV) outputs.get("out_value")).getType() + " " + outputs.get("out_value").getName() + " = (1 - " + inputs.get("in_factor").getName() + ") * clamp(" + inputs.get("in_value1").getName() + ", 0, 1)");
+			sb.append(((ValueSNV) outputs.get("out_value")).getType() + " " + outputs.get("out_value").getName() + " = (1 - " + inputs.get("in_factor").getName() + ") * " + inputs.get("in_value1").getName());
 			sb.append(" + ");
-			sb.append(inputs.get("in_factor").getName() + " * clamp(" + inputs.get("in_value2").getName() + ", 0, 1);\n");
+			sb.append(inputs.get("in_factor").getName() + " * " +  inputs.get("in_value2").getName() + ";\n");
 			break;
 		case SCREEN:
 			sb.append(((ValueSNV) outputs.get("out_value")).getType() + " " + outputs.get("out_value").getName() + " = 1 - (1 - " + inputs.get("in_value1").getName() + ") * (1 - " + inputs.get("in_value2").getName() + ");\n");

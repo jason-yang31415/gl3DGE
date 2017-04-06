@@ -1,7 +1,6 @@
 package render.shader.nodes;
 
 import render.SamplerCube;
-import render.SamplerMap;
 
 public class SamplerCubeSNV extends ShaderNodeValue {
 

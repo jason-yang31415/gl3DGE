@@ -12,6 +12,7 @@ import render.mesh.Mesh;
 import render.mesh.OBJLoader;
 import render.mesh.Resource;
 import render.shader.GameObjectShader;
+import render.shader.ObjectShader;
 import util.Matrix4f;
 import util.Vector3f;
 
@@ -92,16 +93,23 @@ public class GameObject extends Drawable {
 		v = new Vector3f();
 	}*/
 	
-	public GameObject(GameObjectShader gos, VertexDataObject vdo, float radius){
-		super(gos, vdo);
+	public GameObject(ObjectShader os, VertexDataObject vdo){
+		super(os, vdo);
 		
 		// MVP
 		float ratio = 1;
 		Matrix4f projection = Matrix4f.perspective(90, ratio, 0.01f, 100);
 		//Matrix4f projection = Matrix4f.orthographic(-ratio, ratio, -1f, 1f, -1f, 1f);
-		gos.setMVP(new Matrix4f(), new Matrix4f(), projection);
-		
-		bound = new BoundingSphere(this, 1);
+		os.setMVP(new Matrix4f(), new Matrix4f(), projection);
+	}
+	
+	public GameObject(ObjectShader os, VertexDataObject vdo, float radius){
+		this(os, vdo);
+		setBoundingSphere(radius);
+	}
+	
+	public void setBoundingSphere(float radius){
+		bound = new BoundingSphere(this, radius);
 	}
 	
 	public boolean collision(Transform t){

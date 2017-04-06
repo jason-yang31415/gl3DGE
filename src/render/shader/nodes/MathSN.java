@@ -50,24 +50,30 @@ public class MathSN extends ShaderNode {
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(((ValueSNV) outputs.get("out_value")).getType() + " " + outputs.get("out_value").getName() + " = ");
-		sb.append(inputs.get("in_value1").getName());
 		switch (op){
 		case ADD:
+			sb.append(inputs.get("in_value1").getName());
 			sb.append(" + ");
+			sb.append(inputs.get("in_value2").getName() + ";\n");
 			break;
 		case SUBTRACT:
+			sb.append(inputs.get("in_value1").getName());
 			sb.append(" - ");
+			sb.append(inputs.get("in_value2").getName() + ";\n");
 			break;
 		case MULTIPLY:
+			sb.append(inputs.get("in_value1").getName());
 			sb.append(" * ");
+			sb.append(inputs.get("in_value2").getName() + ";\n");
 			break;
 		case DIVIDE:
+			sb.append(inputs.get("in_value1").getName());
 			sb.append(" / ");
+			sb.append(inputs.get("in_value2").getName() + ";\n");
 			break;
 		default:
 			throw new RuntimeException("Math node operation is undefined");
 		}
-		sb.append(inputs.get("in_value2").getName() + ";\n");
 		glsl = sb.toString();
 		return glsl;
 	}

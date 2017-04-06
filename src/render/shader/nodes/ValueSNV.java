@@ -87,6 +87,4 @@ public class ValueSNV extends ShaderNodeValue {
 		return getName() + " = in_" + getName() + ";\n";
 	}
 	
-	
-	
 }

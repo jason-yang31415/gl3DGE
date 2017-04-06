@@ -51,7 +51,7 @@ public abstract class ObjectShader {
 		if (vertexShader == null || fragmentShader == null)
 			throw new RuntimeException("Failed to load Game Object: "
 					+ "\nVertex shader: " + vertexShader
-					+ "\nFragment shader" + fragmentShader );
+					+ "\nFragment shader: " + fragmentShader );
 		return true;
 	}
 	

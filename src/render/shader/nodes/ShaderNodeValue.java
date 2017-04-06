@@ -8,8 +8,13 @@ public abstract class ShaderNodeValue {
 	public static String INPUT_COLOR = "color";
 	public static String INPUT_TEXTURE_COORDINATE = "texture_coordinate";
 	
-	public static String UNIFORM_LIGHT_POSITION = "light_position";
+	//public static String UNIFORM_LIGHT_POSITION = "light_position";
 	public static String UNIFORM_CAMERA_POSITION = "camera_position";
+	
+	public static String UNIFORM_LIGHT_UBO = "light_ubo";
+	public static String UNIFORM_LIGHT_UBO_POSITION = "light_ubo_position";
+	public static String UNIFORM_LIGHT_UBO_COLOR = "light_ubo_color";
+	public static String UNIFORM_LIGHT_UBO_POWER = "light_ubo_power";
 	
 	final ShaderNode parent;
 	final String name;

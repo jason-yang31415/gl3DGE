@@ -6,9 +6,10 @@
 			<accessrule kind="accessible" pattern="com/sun/media/sound/*"/>
 		</accessrules>
 	</classpathentry>
-	<classpathentry kind="lib" path="F:/LWJGL 3/jar/lwjgl.jar" sourcepath="F:/LWJGL 3/src.zip">
+	<classpathentry kind="lib" path="C:/Users/Jason Yang/Documents/Programming/Java Libraries/LWJGL 3/jar/lwjgl.jar" sourcepath="C:/Users/Jason Yang/Documents/Programming/Java Libraries/LWJGL 3/src.zip">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="F:/LWJGL 3/native"/>
+			<attribute name="javadoc_location" value="file:/C:/Users/Jason%20Yang/Documents/Programming/Java%20Libraries/LWJGL%203/doc/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Jason Yang/Documents/Programming/Java Libraries/LWJGL 3/native"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

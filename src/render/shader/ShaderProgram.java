@@ -1,14 +1,36 @@
 package render.shader;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
+import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glCreateProgram;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glGetAttribLocation;
+import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
+import static org.lwjgl.opengl.GL20.glGetProgrami;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
+import static org.lwjgl.opengl.GL20.glUniform1f;
+import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.glUniform2f;
+import static org.lwjgl.opengl.GL20.glUniform3f;
+import static org.lwjgl.opengl.GL20.glUniform4f;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.glUseProgram;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindFragDataLocation;
+import static org.lwjgl.opengl.GL31.glGetUniformBlockIndex;
+import static org.lwjgl.opengl.GL31.glUniformBlockBinding;
 
-import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import util.*;
+import render.UniformBufferObject;
+import util.Matrix4f;
+import util.Vector3f;
+import util.Vector4f;
 
 public class ShaderProgram {
 
@@ -98,6 +120,14 @@ public class ShaderProgram {
 	public void setUniformMat4f(String name, Matrix4f matrix) {
         glUniformMatrix4fv(getUniform(name), false, matrix.getBuffer());
     }
+	
+	public int getUniformBlock(String name){
+		return glGetUniformBlockIndex(id, name);
+	}
+	
+	public void uniformBlockBinding(String name, UniformBufferObject ubo){
+		glUniformBlockBinding(id, getUniformBlock(name), ubo.getBinding());
+	}
 	
 	public void delete(){
 		glDeleteProgram(id);

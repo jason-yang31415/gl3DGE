@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL31;
 
 import render.Drawable;
 import render.SamplerCube;
@@ -26,6 +28,8 @@ import render.shader.Shader;
 import render.shader.ShaderProgram;
 
 public class NodeBasedShader extends ObjectShader {
+	
+	static UBOShaderNodeValue ubo;
 	
 	Map<String, ShaderNodeValue> inputs = new LinkedHashMap<String, ShaderNodeValue>();
 	Map<String, ShaderNodeValue> uniforms = new LinkedHashMap<String, ShaderNodeValue>();
@@ -85,6 +89,18 @@ public class NodeBasedShader extends ObjectShader {
 
 	@Override
 	public void loadShaders() throws IOException {
+		String vertexSource = getVertexSource();
+		System.out.println(vertexSource);
+		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
+		String fragmentSource = getFragmentSource();
+		System.out.println(fragmentSource);
+		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
+		
+		loadVertexShader(vertexShader);
+		loadFragmentShader(fragmentShader);
+	}
+	
+	public String getVertexSource(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("#version 150 core\n");
 		for (ShaderNodeValue input : inputs.values()){
@@ -102,15 +118,7 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("gl_Position = mvp * vec4(in_" + inputs.get(ShaderNodeValue.INPUT_POSITION).getName() + ", 1.0);\n");
 		sb.append("}\n");
 		
-		String vertexSource = sb.toString();
-		System.out.println(vertexSource);
-		Shader vertexShader = new Shader(GL_VERTEX_SHADER, vertexSource);
-		String fragmentSource = getFragmentSource();
-		System.out.println(fragmentSource);
-		Shader fragmentShader = new Shader(GL_FRAGMENT_SHADER, fragmentSource);
-		
-		loadVertexShader(vertexShader);
-		loadFragmentShader(fragmentShader);
+		return sb.toString();
 	}
 	
 	public String getFragmentSource(){
@@ -121,6 +129,13 @@ public class NodeBasedShader extends ObjectShader {
 		sb.append("out vec4 fragColor;\n");
 		for (ShaderNodeValue uniform : uniforms.values())
 			sb.append("uniform " + uniform.getType() + " " + uniform.getName() + ";\n");
+		if (ubo != null){
+			sb.append("layout (std140) uniform " + ubo.getName() + " {\n");
+			for (ShaderNodeValue uniform : ubo.getUniforms().values())
+				sb.append("uniform " + uniform.getType() + " " + uniform.getName() + ";\n");
+			sb.append("};\n");
+		}
+
 		sb.append("uniform mat4 model;\n");
 		sb.append("uniform mat4 view;\n");
 		sb.append("uniform mat4 projection;\n");
@@ -190,6 +205,14 @@ public class NodeBasedShader extends ObjectShader {
 	public OutputSN getOutputNode(){
 		return out;
 	}
+	
+	public static void setUBO(UBOShaderNodeValue ubo){
+		NodeBasedShader.ubo = ubo;
+	}
+	
+	public static UBOShaderNodeValue getUBO(){
+		return ubo;
+	}
 
 	@Override
 	public void init() {
@@ -206,13 +229,14 @@ public class NodeBasedShader extends ObjectShader {
 			else if (snv instanceof SamplerCubeSNV)
 				shader.setUniform1i(snv.getName(), ((SamplerCubeSNV) snv).getSamplerCube().getLocation());
 		}
+		shader.uniformBlockBinding(ubo.getName(), ubo.getUBO());
 		shader.unbind();
 	}
 	
 	public void setVBOPointers(VertexBufferObject vbo){
 		shader.bind();
 		vbo.bind(GL_ARRAY_BUFFER);
-		int floatSize = 4;
+		int floatSize = 4; //NOTE: FIX
 		int stride = 0;
 		for (ShaderNodeValue input : inputs.values())
 			stride += input.getSize();
@@ -233,9 +257,61 @@ public class NodeBasedShader extends ObjectShader {
 		shader.bind();
 		shader.setUniformMat4f("model", d.getMatrix());
 		shader.setUniformMat4f("view", scene.getCamera().getLookAt());
-		shader.setUniformVec3f(uniforms.get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName(), scene.getLight().getPos());
-		shader.setUniformVec3f(uniforms.get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName(), scene.getCamera().getPos());
+		/*if (uniforms.containsKey(ShaderNodeValue.UNIFORM_LIGHT_POSITION))
+			shader.setUniformVec3f(uniforms.get(ShaderNodeValue.UNIFORM_LIGHT_POSITION).getName(), scene.getLight().getPos());*/
+		if (uniforms.containsKey(ShaderNodeValue.UNIFORM_CAMERA_POSITION))
+			shader.setUniformVec3f(uniforms.get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName(), scene.getCamera().getPos());
+		
 		shader.unbind();
+	}
+	
+	public static void updateUBO(Scene scene){
+		ArrayList<Float> array = new ArrayList<Float>();
+		for (String key : ubo.getUniforms().keySet()){
+			ShaderNodeValue snv = ubo.getUniforms().get(key);
+			int size = std140(snv.getSize());
+			int extra = array.size() % size;
+			int num = (extra == 0) ? 0 : size - extra;
+			for (int i = 0; i < num; i++)
+				array.add(1f);
+			
+			if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION)){
+				array.add(scene.getLight().getPos().x);
+				array.add(scene.getLight().getPos().y);
+				array.add(scene.getLight().getPos().z);
+			}
+			else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_COLOR)){
+				array.add(scene.getLight().getColor().x);
+				array.add(scene.getLight().getColor().y);
+				array.add(scene.getLight().getColor().z);
+			}
+			else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POWER)){
+				array.add(scene.getLight().getPower());
+			}
+		}
+		FloatBuffer fb = BufferUtils.createFloatBuffer(array.size());
+		for (float f : array)
+			fb.put(f);
+		fb.flip();
+		ubo.getUBO().bind();
+		//GL15.glBufferSubData(GL31.GL_UNIFORM_BUFFER, 0, fb);
+		GL15.glBufferData(GL31.GL_UNIFORM_BUFFER, fb, GL15.GL_DYNAMIC_DRAW);
+		ubo.getUBO().unbind();
+	}
+	
+	public static int std140(int size){
+		switch (size){
+		case 1:
+			return 1;
+		case 2:
+			return 2;
+		case 3:
+			return 4;
+		case 4:
+			return 4;
+		default:
+			return 0;
+		}
 	}
 	
 	public void bind(){

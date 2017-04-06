@@ -47,6 +47,19 @@ public class Vector4f {
         this.z = 0f;
         this.w = 0f;
     }
+    
+    /**
+     * Creates a 4-tuple vector from a 3-tuple vector and a value
+     * 
+     * @param vector x, y, z values
+     * @param w w value
+     */
+    public Vector4f(Vector3f vector3, float w){
+    	this.x = vector3.x;
+    	this.y = vector3.y;
+    	this.z = vector3.z;
+    	this.w = w;
+    }
 
     /**
      * Creates a 4-tuple vector with specified values.

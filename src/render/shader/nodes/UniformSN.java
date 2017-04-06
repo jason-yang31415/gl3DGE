@@ -9,11 +9,12 @@ public class UniformSN extends ShaderNode{
 	}
 	
 	public void init(){
-		outputs.put(ShaderNodeValue.UNIFORM_LIGHT_POSITION, new PositionSNV(this, ShaderNodeValue.UNIFORM_LIGHT_POSITION));
+		//outputs.put(ShaderNodeValue.UNIFORM_LIGHT_POSITION, new PositionSNV(this, ShaderNodeValue.UNIFORM_LIGHT_POSITION));
 	}
 	
 	public PositionSNV getOutLightPosition(){
-		return (PositionSNV) outputs.get(ShaderNodeValue.UNIFORM_LIGHT_POSITION);
+		//return (PositionSNV) outputs.get(ShaderNodeValue.UNIFORM_LIGHT_POSITION);
+		return null;
 	}
 
 	@Override
