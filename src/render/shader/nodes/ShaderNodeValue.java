@@ -12,12 +12,14 @@ public abstract class ShaderNodeValue {
 	public static String UNIFORM_CAMERA_POSITION = "camera_position";
 	
 	public static String UNIFORM_LIGHT_UBO = "light_ubo";
+	public static String UNIFORM_LIGHT_UBO_STRUCT = "light_ubo_struct";
 	public static String UNIFORM_LIGHT_UBO_POSITION = "light_ubo_position";
 	public static String UNIFORM_LIGHT_UBO_COLOR = "light_ubo_color";
 	public static String UNIFORM_LIGHT_UBO_POWER = "light_ubo_power";
+	public static String UNIFORM_LIGHT_UBO_NUMBER = "light_ubo_number";
 	
 	final ShaderNode parent;
-	final String name;
+	String name;
 	int size;
 	
 	public ShaderNodeValue(ShaderNode parent, String name){

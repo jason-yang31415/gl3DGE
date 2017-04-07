@@ -28,4 +28,9 @@ public abstract class ShaderNode {
 	
 	public abstract String getGLSL();
 	
+	public static String getLightProperty(String property){
+		StructureSNV struct = (StructureSNV) NodeBasedShader.getUBO().getUniforms().get(ShaderNodeValue.UNIFORM_LIGHT_UBO_STRUCT);
+		return struct.getName() + "." + struct.getStruct().getValues().get(property).getName();
+	}
+	
 }

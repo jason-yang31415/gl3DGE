@@ -16,6 +16,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL31;
 
 import render.Drawable;
+import render.Light;
 import render.SamplerCube;
 import render.SamplerMap;
 import render.Scene;
@@ -29,7 +30,8 @@ import render.shader.ShaderProgram;
 
 public class NodeBasedShader extends ObjectShader {
 	
-	static UBOShaderNodeValue ubo;
+	static UniformBufferObjectSNV ubo;
+	static ArrayList<Structure> structs = new ArrayList<Structure>();
 	
 	Map<String, ShaderNodeValue> inputs = new LinkedHashMap<String, ShaderNodeValue>();
 	Map<String, ShaderNodeValue> uniforms = new LinkedHashMap<String, ShaderNodeValue>();
@@ -124,6 +126,12 @@ public class NodeBasedShader extends ObjectShader {
 	public String getFragmentSource(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("#version 150 core\n");
+		for (Structure struct : structs){
+			sb.append("struct " + struct.getName() + " {\n");
+			for (ShaderNodeValue value : struct.getValues().values())
+				sb.append("  " + value.getType() + " " + value.getName() + ";\n");
+			sb.append("};\n");
+		}
 		for (ShaderNodeValue input : inputs.values())
 			sb.append("in " + input.getType() + " " + input.getVarying() + ";\n");
 		sb.append("out vec4 fragColor;\n");
@@ -174,6 +182,10 @@ public class NodeBasedShader extends ObjectShader {
 		uniforms.put(name, uniform);
 	}
 	
+	public static void addStructure(Structure struct){
+		structs.add(struct);
+	}
+	
 	public void addConstant(ShaderNodeValue value){
 		constants.add(value);
 	}
@@ -202,15 +214,19 @@ public class NodeBasedShader extends ObjectShader {
 		return uniforms;
 	}
 	
+	public ArrayList<Structure> getStructures(){
+		return structs;
+	}
+	
 	public OutputSN getOutputNode(){
 		return out;
 	}
 	
-	public static void setUBO(UBOShaderNodeValue ubo){
+	public static void setUBO(UniformBufferObjectSNV ubo){
 		NodeBasedShader.ubo = ubo;
 	}
 	
-	public static UBOShaderNodeValue getUBO(){
+	public static UniformBufferObjectSNV getUBO(){
 		return ubo;
 	}
 
@@ -267,26 +283,31 @@ public class NodeBasedShader extends ObjectShader {
 	
 	public static void updateUBO(Scene scene){
 		ArrayList<Float> array = new ArrayList<Float>();
-		for (String key : ubo.getUniforms().keySet()){
-			ShaderNodeValue snv = ubo.getUniforms().get(key);
-			int size = std140(snv.getSize());
-			int extra = array.size() % size;
-			int num = (extra == 0) ? 0 : size - extra;
-			for (int i = 0; i < num; i++)
-				array.add(1f);
-			
-			if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION)){
-				array.add(scene.getLight().getPos().x);
-				array.add(scene.getLight().getPos().y);
-				array.add(scene.getLight().getPos().z);
-			}
-			else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_COLOR)){
-				array.add(scene.getLight().getColor().x);
-				array.add(scene.getLight().getColor().y);
-				array.add(scene.getLight().getColor().z);
-			}
-			else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POWER)){
-				array.add(scene.getLight().getPower());
+		for (String k : ubo.getUniforms().keySet()){
+			if (k.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_STRUCT)){
+				for (String key : ((StructureSNV) ubo.getUniforms().get(k)).getStruct().getValues().keySet()){
+					Structure struct = ((StructureSNV) ubo.getUniforms().get(k)).getStruct();
+					ShaderNodeValue snv = struct.getValues().get(key);
+					int size = std140(snv.getSize());
+					int extra = array.size() % size;
+					int num = (extra == 0) ? 0 : size - extra;
+					for (int i = 0; i < num; i++)
+						array.add(1f);
+					
+					if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION)){
+						array.add(scene.getLight().getPos().x);
+						array.add(scene.getLight().getPos().y);
+						array.add(scene.getLight().getPos().z);
+					}
+					else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_COLOR)){
+						array.add(scene.getLight().getColor().x);
+						array.add(scene.getLight().getColor().y);
+						array.add(scene.getLight().getColor().z);
+					}
+					else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POWER)){
+						array.add(scene.getLight().getPower());
+					}
+				}
 			}
 		}
 		FloatBuffer fb = BufferUtils.createFloatBuffer(array.size());

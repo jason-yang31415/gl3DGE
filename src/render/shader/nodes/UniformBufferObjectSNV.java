@@ -5,18 +5,18 @@ import java.util.Map;
 
 import render.UniformBufferObject;
 
-public class UBOShaderNodeValue {
+public class UniformBufferObjectSNV {
 	
 	String name;
 	Map<String, ShaderNodeValue> uniforms = new LinkedHashMap<String, ShaderNodeValue>();
 	
 	UniformBufferObject ubo;
 	
-	public UBOShaderNodeValue(String name){
+	public UniformBufferObjectSNV(String name){
 		this.name = name;
 	}
 	
-	public UBOShaderNodeValue(String name, UniformBufferObject ubo){
+	public UniformBufferObjectSNV(String name, UniformBufferObject ubo){
 		this.name = name;
 		this.ubo = ubo;
 	}
