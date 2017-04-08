@@ -42,6 +42,8 @@ public abstract class ShaderNodeValue {
 		return size;
 	}
 	
+	public abstract int getSTD140Alignment();
+	
 	public abstract String getType();
 	
 	public abstract String getGLSL();
@@ -51,5 +53,25 @@ public abstract class ShaderNodeValue {
 	public abstract String getVarying();
 	
 	public abstract String getVertexGLSL();
+	
+	public static ShaderNodeValue getNewInstance(ShaderNodeValue value, ShaderNode parent, String name){
+		if (value instanceof ValueSNV){
+			if (((ValueSNV) value).getSize() == 1)
+				return new ValueSNV(parent, name).defineAsFloat();
+			else if (((ValueSNV) value).getSize() == 2)
+				return new ValueSNV (parent, name).defineAsVector2f();
+			else if (((ValueSNV) value).getSize() == 3)
+				return new ValueSNV (parent, name).defineAsVector3f();
+			else if (((ValueSNV) value).getSize() == 4)
+				return new ValueSNV (parent, name).defineAsVector4f();
+		}
+		else if (value instanceof SamplerSNV)
+			return new SamplerSNV(parent, name, ((SamplerSNV) value).getSampler());
+		else if (value instanceof SamplerCubeSNV)
+			return new SamplerCubeSNV(parent, name, ((SamplerCubeSNV) value).getSamplerCube());
+		else if (value instanceof StructureSNV)
+			return new StructureSNV(parent, name, ((StructureSNV) value).getStruct());
+		return null;
+	}
 	
 }

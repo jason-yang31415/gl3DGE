@@ -86,5 +86,21 @@ public class ValueSNV extends ShaderNodeValue {
 	public String getVertexGLSL() {
 		return getName() + " = in_" + getName() + ";\n";
 	}
+
+	@Override
+	public int getSTD140Alignment() {
+		switch (size){
+		case 1:
+			return 1;
+		case 2:
+			return 2;
+		case 3:
+			return 4;
+		case 4:
+			return 4;
+		default:
+			return 0;
+		}
+	}
 	
 }

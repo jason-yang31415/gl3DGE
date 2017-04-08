@@ -285,29 +285,44 @@ public class NodeBasedShader extends ObjectShader {
 		ArrayList<Float> array = new ArrayList<Float>();
 		for (String k : ubo.getUniforms().keySet()){
 			if (k.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_STRUCT)){
-				for (String key : ((StructureSNV) ubo.getUniforms().get(k)).getStruct().getValues().keySet()){
-					Structure struct = ((StructureSNV) ubo.getUniforms().get(k)).getStruct();
-					ShaderNodeValue snv = struct.getValues().get(key);
-					int size = std140(snv.getSize());
-					int extra = array.size() % size;
-					int num = (extra == 0) ? 0 : size - extra;
-					for (int i = 0; i < num; i++)
-						array.add(1f);
-					
-					if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION)){
-						array.add(scene.getLight().getPos().x);
-						array.add(scene.getLight().getPos().y);
-						array.add(scene.getLight().getPos().z);
+				ArraySNV a = (ArraySNV) ubo.getUniforms().get(k);
+				std140Pad(array, a);
+				
+				int lightStructLength = 0;
+				for (int i = 0; i < a.getLength(); i++){
+					if (i < scene.getLights().size()){
+						Light l = scene.getLights().get(i);
+						StructureSNV struct = (StructureSNV) a.getValue();
+						std140Pad(array, struct);
+						lightStructLength = array.size();
+						for (String key : struct.getStruct().getValues().keySet()){
+							ShaderNodeValue snv = struct.getStruct().getValues().get(key);
+							std140Pad(array, snv);
+							
+							if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION)){
+								array.add(l.getPos().x);
+								array.add(l.getPos().y);
+								array.add(l.getPos().z);
+							}
+							else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_COLOR)){
+								array.add(l.getColor().x);
+								array.add(l.getColor().y);
+								array.add(l.getColor().z);
+							}
+							else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POWER)){
+								array.add(l.getPower());
+							}
+						}
+						lightStructLength = array.size() - lightStructLength;
 					}
-					else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_COLOR)){
-						array.add(scene.getLight().getColor().x);
-						array.add(scene.getLight().getColor().y);
-						array.add(scene.getLight().getColor().z);
-					}
-					else if (key.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_POWER)){
-						array.add(scene.getLight().getPower());
+					else {
+						for (int n = 0; n < lightStructLength; n++)
+							array.add((float) 0);
 					}
 				}
+			}
+			else if (k.equals(ShaderNodeValue.UNIFORM_LIGHT_UBO_NUMBER)){
+				array.add((float) scene.getLights().size());
 			}
 		}
 		FloatBuffer fb = BufferUtils.createFloatBuffer(array.size());
@@ -320,19 +335,12 @@ public class NodeBasedShader extends ObjectShader {
 		ubo.getUBO().unbind();
 	}
 	
-	public static int std140(int size){
-		switch (size){
-		case 1:
-			return 1;
-		case 2:
-			return 2;
-		case 3:
-			return 4;
-		case 4:
-			return 4;
-		default:
-			return 0;
-		}
+	public static void std140Pad(ArrayList<Float> array, ShaderNodeValue value){
+		int size = value.getSTD140Alignment();
+		int extra = array.size() % size;
+		int num = (extra == 0) ? 0 : size - extra;
+		for (int i = 0; i < num; i++)
+			array.add(1f);
 	}
 	
 	public void bind(){

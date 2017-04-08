@@ -10,6 +10,11 @@ public class SamplerCubeSNV extends ShaderNodeValue {
 		super(parent, name);
 	}
 	
+	public SamplerCubeSNV(ShaderNode parent, String name, SamplerCube samplerCube){
+		super(parent, name);
+		setSamplerCube(samplerCube);
+	}
+	
 	public void setSamplerCube(SamplerCube samplerCube){
 		this.samplerCube = samplerCube;
 	}
@@ -41,6 +46,11 @@ public class SamplerCubeSNV extends ShaderNodeValue {
 	@Override
 	public String getVertexGLSL() {
 		return null;
+	}
+
+	@Override
+	public int getSTD140Alignment() {
+		return 0;
 	}
 	
 }

@@ -21,8 +21,8 @@ public class LightIntensitySN extends ShaderNode {
 		StringBuilder sb = new StringBuilder();
 		sb.append("float " + outputs.get("out_intensity").getName() + " = ");
 		sb.append("1 / pow(length(" + nbs.getInputNode().getOutWorldPosition().getName() + " - ");
-		sb.append(ShaderNode.getLightProperty(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION) + "), 2) * ");
-		sb.append(ShaderNode.getLightProperty(ShaderNodeValue.UNIFORM_LIGHT_UBO_POWER) + ";\n");
+		sb.append(getLightProperty(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION) + "), 2) * ");
+		sb.append(getLightProperty(ShaderNodeValue.UNIFORM_LIGHT_UBO_POWER) + ";\n");
 		glsl = sb.toString();
 		return glsl;
 	}

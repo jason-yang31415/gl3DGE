@@ -24,7 +24,7 @@ public class PhongSpecularSN extends ShaderNode {
 	@Override
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("vec3 " + variable("L") + " = normalize(" + ShaderNode.getLightProperty(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION) + " - " + nbs.getInputNode().getOutWorldPosition().getName() + ");\n");
+		sb.append("vec3 " + variable("L") + " = normalize(" + getLightProperty(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION) + " - " + nbs.getInputNode().getOutWorldPosition().getName() + ");\n");
 		sb.append("vec3 " + variable("E") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName() + " - " + nbs.getInputNode().getOutWorldPosition().getName() + ");\n");
 		sb.append("vec3 " + variable("R") + " = normalize(reflect(-" + variable("L") + ", " + nbs.getInputNode().getOutNormal().getName() + "));\n");
 		sb.append("float " + variable("dot") + " = clamp(dot(" + variable("E") + ", " + variable("R") + "), 0, 1);\n");

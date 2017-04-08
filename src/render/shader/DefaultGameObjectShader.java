@@ -195,9 +195,9 @@ public class DefaultGameObjectShader extends GameObjectShader {
 		shader.bind();
 		shader.setUniformMat4f("model", d.getMatrix());
 		shader.setUniformMat4f("view", scene.getCamera().getLookAt());
-		shader.setUniformVec3f("lightPos", scene.getLight().getPos());
-		shader.setUniformVec3f("lightColor", scene.getLight().getColor());
-		shader.setUniform1f("lightPower", scene.getLight().getPower());
+		shader.setUniformVec3f("lightPos", scene.getLights().get(0).getPos());
+		shader.setUniformVec3f("lightColor", scene.getLights().get(0).getColor());
+		shader.setUniform1f("lightPower", scene.getLights().get(0).getPower());
 		shader.unbind();
 	}
 
