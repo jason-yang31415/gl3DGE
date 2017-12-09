@@ -3,24 +3,24 @@ package render.shader.nodes;
 public class StructureSN extends ShaderNode {
 
 	String key;
-	
+
 	public StructureSN(NodeBasedShader nbs, String key) {
 		super(nbs, nbs.genNodes());
 		this.key = key;
-		
+
 		init();
 	}
-	
+
 	public void init(){
 		inputs.put("in_structure", null);
 		outputs.put("out_value", null);
 	}
-	
+
 	public void setInStructure(StructureSNV struct){
 		inputs.put("in_structure", struct);
 		outputs.put("out_value", ShaderNodeValue.getNewInstance(struct.getStruct().getValues().get(key), this, "value"));
 	}
-	
+
 	public ShaderNodeValue getOutValue(){
 		return outputs.get("out_value");
 	}
@@ -32,5 +32,5 @@ public class StructureSN extends ShaderNode {
 		glsl = sb.toString();
 		return glsl;
 	}
-	
+
 }

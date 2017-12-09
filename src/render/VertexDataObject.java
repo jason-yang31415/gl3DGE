@@ -15,23 +15,23 @@ import render.mesh.Mesh;
 import render.shader.ObjectShader;
 
 public class VertexDataObject {
-	
+
 	private VertexBufferObject vbo;
 	private VertexArrayObject vao;
 	private ElementBufferObject ebo;
-	
+
 	private int count;
-	
+
 	public void loadVertexData(Mesh mesh, ObjectShader shader){
 		loadVAO();
 		loadVBO(mesh, shader);
 		loadEBO(mesh);
 	}
-	
+
 	public void loadVAO(){
 		vao = new VertexArrayObject();
 	}
-	
+
 	public void loadVBO(Mesh mesh, ObjectShader shader){
 		FloatBuffer vertices = shader.getVertices(mesh);
 		vao.bind();
@@ -42,7 +42,7 @@ public class VertexDataObject {
 		vbo.unbind(GL_ARRAY_BUFFER);
 		vao.unbind();
 	}
-	
+
 	public void loadEBO(Mesh mesh){
 		vao.bind();
 		int[] indices = new int[mesh.getIndices().size()];
@@ -58,23 +58,23 @@ public class VertexDataObject {
 		ebo.unbind();
 		vao.unbind();
 	}
-	
+
 	public VertexArrayObject getVAO(){
 		return vao;
 	}
-	
+
 	public VertexBufferObject getVBO(){
 		return vbo;
 	}
-	
+
 	public ElementBufferObject getEBO(){
 		return ebo;
 	}
-	
+
 	public int getCount(){
 		return count;
 	}
-	
+
 	public void draw(ObjectShader os){
 		vao.bind();
 		ebo.bind();
@@ -84,5 +84,5 @@ public class VertexDataObject {
 		ebo.unbind();
 		vao.unbind();
 	}
-	
+
 }

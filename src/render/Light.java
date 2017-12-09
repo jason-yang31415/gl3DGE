@@ -25,6 +25,10 @@ public class Light {
 		this.power = power;
 	}
 	
+	public Light(Vector3f pos){
+		this(pos, new Vector3f(1, 1, 1), 1);
+	}
+	
 	public void setPos(Vector3f pos){
 		this.pos = pos;
 	}
