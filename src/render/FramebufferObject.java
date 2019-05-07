@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL11.GL_RGB;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL14.GL_DEPTH_COMPONENT24;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;
@@ -51,9 +52,11 @@ public class FramebufferObject {
 
 	public static FramebufferObject createFramebuffer(int WIDTH, int HEIGHT, int location){
 		SamplerMap texture = new SamplerMap(WIDTH, HEIGHT, location);
-		texture.texImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, ByteBuffer.allocate(1024));
+		texture.texImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, null);
+		texture.setTextureWrap(GL_CLAMP_TO_EDGE);
 		SamplerMap depth = new SamplerMap(WIDTH, HEIGHT, location + 1);
 		depth.texImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		depth.setTextureWrap(GL_CLAMP_TO_EDGE);
 		LinkedHashMap<String, RenderTarget> targets = new LinkedHashMap<String, RenderTarget>();
 		targets.put(FBO_TARGET_TEXTURE, new RenderTarget(texture, Target.COLOR));
 		targets.put(FBO_TARGET_DEPTH, new RenderTarget(depth, Target.DEPTH));
@@ -104,20 +107,24 @@ public class FramebufferObject {
 		int i = 0;
 		while (iterator.hasNext()){
 			RenderTarget target = iterator.next();
-			target.attach();
-			buffer.put(GL_COLOR_ATTACHMENT0 + i);
+			target.attach(i, buffer);
 			i++;
 		}
 
+		buffer.flip();
 		// FIX
-		//GL20.glDrawBuffers(buffer);
-		GL20.glDrawBuffers(GL_COLOR_ATTACHMENT0);
+		GL20.glDrawBuffers(buffer);
+		//GL20.glDrawBuffers(GL_COLOR_ATTACHMENT0);
 
 		int error = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (error != GL_FRAMEBUFFER_COMPLETE)
 			throw new RuntimeException(String.format("%d", error));
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	public LinkedHashMap<String, RenderTarget> getTargets(){
+		return targets;
 	}
 
 	public void update(int WIDTH, int HEIGHT){

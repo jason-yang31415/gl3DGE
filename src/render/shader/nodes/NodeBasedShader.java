@@ -126,7 +126,7 @@ public class NodeBasedShader extends ObjectShader {
 
 	public String getFragmentSource(){
 		StringBuilder sb = new StringBuilder();
-		sb.append("#version 150 core\n");
+		sb.append("#version 330 core\n"); // NOTE: IMPLEMENT VERSIONING
 		for (Structure struct : structs){
 			sb.append("struct " + struct.getName() + " {\n");
 			for (ShaderNodeValue value : struct.getValues().values())
@@ -135,7 +135,12 @@ public class NodeBasedShader extends ObjectShader {
 		}
 		for (ShaderNodeValue input : inputs.values())
 			sb.append("in " + input.getType() + " " + input.getVarying() + ";\n");
-		sb.append("out vec4 fragColor;\n");
+		//sb.append("layout(location = 0) out vec4 fragColor;\n");
+		int i = 0;
+		for (String s : out.getOutputs().keySet()){
+			sb.append("layout(location = " + i + ") out vec4 " + s + ";\n");
+			i++;
+		}
 		for (ShaderNodeValue uniform : uniforms.values())
 			sb.append("uniform " + uniform.getType() + " " + uniform.getName() + ";\n");
 		if (ubo != null){
@@ -236,7 +241,7 @@ public class NodeBasedShader extends ObjectShader {
 		shader = new ShaderProgram();
 		shader.attachShader(vertexShader);
 		shader.attachShader(fragmentShader);
-		shader.bindFragDataLocation(0, "fragColor");
+		//shader.bindFragDataLocation(0, "fragColor");
 		shader.link();
 		shader.bind();
 

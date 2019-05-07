@@ -11,6 +11,7 @@ public class DiffuseSN extends ShaderNode {
 	public void init(){
 		inputs.put("in_color", null);
 		inputs.put("in_normal", nbs.getInputNode().getOutNormal());
+		inputs.put("in_position", nbs.getInputNode().getOutWorldPosition());
 		outputs.put("out_kdiff", new ValueSNV(this, "kdiff").defineAsFloat());
 		outputs.put("out_color", new ColorSNV(this, "color"));
 	}
@@ -21,6 +22,10 @@ public class DiffuseSN extends ShaderNode {
 
 	public void setInNormal(ValueSNV normal){
 		inputs.put("in_normal", normal);
+	}
+
+	public void setInPosition(ValueSNV position){
+		inputs.put("in_position", position);
 	}
 
 	public ValueSNV getOutKdiff(){
@@ -36,7 +41,7 @@ public class DiffuseSN extends ShaderNode {
 		StringBuilder sb = new StringBuilder();
 		sb.append("vec3 " + variable("L") + " = normalize("
 				+ getLightProperty(ShaderNodeValue.UNIFORM_LIGHT_UBO_POSITION)
-				+ " - " + nbs.getInputNode().getOutWorldPosition().getName() + ");\n");
+				+ " - " + inputs.get("in_position").getName() + ");\n");
 		sb.append("float " + getOutKdiff().getName() + " = clamp(dot(" + inputs.get("in_normal").getName() + ", " + variable("L") + "), 0, 1);\n");
 		if (inputs.get("in_color") != null)
 			sb.append("vec3 " + getOutColor().getName() + " = " + inputs.get("in_color").getName() + " * " + getOutKdiff().getName() + ";\n");

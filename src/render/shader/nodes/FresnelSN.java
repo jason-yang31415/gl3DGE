@@ -4,24 +4,29 @@ public class FresnelSN extends ShaderNode {
 
 	public FresnelSN(NodeBasedShader nbs){
 		super(nbs, nbs.genNodes());
-		
+
 		init();
 	}
-	
+
 	public void init(){
 		inputs.put("in_ior", null);
 		inputs.put("in_normal", nbs.getInputNode().getOutNormal());
+		inputs.put("in_position", nbs.getInputNode().getOutWorldPosition());
 		outputs.put("out_R", new ValueSNV(this, "R"));
 	}
-	
+
 	public void setInIOR(ValueSNV ior){
 		inputs.put("in_ior", ior);
 	}
-	
-	public void setInNormal(NormalSNV normal){
+
+	public void setInNormal(ValueSNV normal){
 		inputs.put("in_normal", normal);
 	}
-	
+
+	public void setInPosition(ValueSNV position){
+		inputs.put("in_position", position);
+	}
+
 	public ValueSNV getOutR(){
 		return (ValueSNV) outputs.get("out_R");
 	}
@@ -29,12 +34,12 @@ public class FresnelSN extends ShaderNode {
 	@Override
 	public String getGLSL() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("vec3 " + variable("E") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName() + " - " + nbs.getInputNode().getOutWorldPosition().getName() + ");\n");
+		sb.append("vec3 " + variable("E") + " = normalize(" + nbs.getUniforms().get(ShaderNodeValue.UNIFORM_CAMERA_POSITION).getName() + " - " + inputs.get("in_position").getName() + ");\n");
 		sb.append("float " + variable("cos") + " = dot(normalize(" + inputs.get("in_normal").getName() + "), " + variable("E") + ");\n");
 		sb.append("float " + variable("r0") + " = pow((1 - " + inputs.get("in_ior").getName() + ") / (1 + " + inputs.get("in_ior").getName() + "), 2);\n");
 		sb.append("float " + outputs.get("out_R").getName() + " = " + variable("r0") + " + (1 - " + variable("r0") + ") * pow(1 - " + variable("cos") + ", 5);\n");
 		glsl = sb.toString();
 		return glsl;
 	}
-	
+
 }

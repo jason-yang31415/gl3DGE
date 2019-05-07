@@ -4,7 +4,6 @@ import static org.lwjgl.opengl.GL11.GL_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.stb.STBTruetype.stbtt_BakeFontBitmap;
-import io.IOUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,11 +13,12 @@ import java.nio.ByteBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTBakedChar;
 
+import io.IOUtil;
 import render.SamplerMap;
 import render.VertexDataObject;
-import render.mesh.Resource;
 import render.shader.nodes.AlphaTestSN;
 import render.shader.nodes.NodeBasedShader;
+import render.shader.nodes.OutputSN;
 import render.shader.nodes.SamplerSN;
 import render.shader.nodes.SamplerSNV;
 import render.shader.nodes.ShaderNodeValue;
@@ -26,46 +26,46 @@ import render.shader.nodes.ValueSNV;
 import util.Vector3f;
 
 public class TrueTypeFont {
-	
+
 	private int BITMAP_SIZE = 512;
-	
+
 	private STBTTBakedChar.Buffer cdata;
-	
+
 	private SamplerMap tex;
 	private int fontSize;
-	
+
 	private NodeBasedShader ts;
 	private VertexDataObject vdo;
 
 	public TrueTypeFont(String path, int fontSize){
 		this.fontSize = fontSize;
-		
+
 		cdata = STBTTBakedChar.malloc(96);
 		try {
 			ByteBuffer ttf = IOUtil.ioResourceToByteBuffer(path, 160 * 1024);
-			
+
 			ByteBuffer bitmap = BufferUtils.createByteBuffer(BITMAP_SIZE * BITMAP_SIZE);
 			stbtt_BakeFontBitmap(ttf, fontSize, bitmap, BITMAP_SIZE, BITMAP_SIZE, 32, cdata);
-			
+
 			tex = new SamplerMap(BITMAP_SIZE, BITMAP_SIZE, SamplerMap.TEX_DEFAULT);
 			tex.texImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, BITMAP_SIZE, BITMAP_SIZE, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		loadShader();
 	}
-	
+
 	public void loadShader(){
 		ts = new NodeBasedShader();
 		ts.addInput(ShaderNodeValue.INPUT_POSITION, ts.getInputNode()
 				.getOutPosition());
 		ts.addInput(ShaderNodeValue.INPUT_TEXTURE_COORDINATE, ts
 				.getInputNode().getOutTextureCoordinate());
-		
+
 		ts.addSampler(getTexture());
-		
+
 		SamplerSN texSampler2 = new SamplerSN(ts);
 		SamplerSNV texSNV2 = new SamplerSNV(null, "texture");
 		texSNV2.setSampler(getTexture());
@@ -74,17 +74,17 @@ public class TrueTypeFont {
 		texSampler2.setInTextureCoordinate(ts.getInputNode()
 				.getOutTextureCoordinate());
 		ts.addNode(texSampler2);
-		
+
 		AlphaTestSN at = new AlphaTestSN(ts);
 		at.setInValue(texSampler2.getOutAlpha());
 		ts.addNode(at);
-		
+
 		ValueSNV color = new ValueSNV(null, "color");
 		color.defineAsVector3f(new Vector3f(1, 1, 1));
 		ts.addConstant(color);
 		//ts.getOutputNode().setInColor(texSampler2.getOutColor());
-		ts.getOutputNode().setInColor(color);
-		
+		ts.getOutputNode().setInColor(color, OutputSN.DEFAULT_OUTPUT);
+
 		try {
 			ts.loadShaders();
 			ts.check();
@@ -96,31 +96,31 @@ public class TrueTypeFont {
 		vdo = new VertexDataObject();
 		vdo.loadVAO();
 	}
-	
+
 	public VertexDataObject getVDO(){
 		return vdo;
 	}
-	
+
 	public NodeBasedShader getShader(){
 		return ts;
 	}
-	
+
 	public STBTTBakedChar.Buffer getCData(){
 		return cdata;
 	}
-	
+
 	public int getBitmapSize(){
 		return BITMAP_SIZE;
 	}
-	
+
 	public int getFontSize(){
 		return fontSize;
 	}
-	
+
 	public SamplerMap getTexture(){
 		return tex;
 	}
-	
+
 	public ByteArrayOutputStream readInputStream(InputStream is) throws IOException{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] byteArray = new byte[1024];
@@ -131,5 +131,5 @@ public class TrueTypeFont {
 		baos.flush();
 		return baos;
 	}
-	
+
 }

@@ -4,19 +4,19 @@ public class VectorConvertSN extends ShaderNode {
 
 	public VectorConvertSN(NodeBasedShader nbs) {
 		super(nbs, nbs.genNodes());
-		
+
 		init();
 	}
-	
+
 	public void init(){
 		inputs.put("in_value", null);
-		outputs.put("out_value", new ColorSNV(this, "value"));
+		outputs.put("out_value", new ColorSNV(this, "value").defineAsVector4f());
 	}
-	
+
 	public void setInValue(ValueSNV value){
 		inputs.put("in_value", value);
 	}
-	
+
 	public ValueSNV getOutValue(){
 		return (ValueSNV) outputs.get("out_value");
 	}
@@ -28,5 +28,5 @@ public class VectorConvertSN extends ShaderNode {
 		glsl = sb.toString();
 		return glsl;
 	}
-	
+
 }

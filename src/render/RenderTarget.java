@@ -6,6 +6,8 @@ import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;
 import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
 
+import java.nio.IntBuffer;
+
 public class RenderTarget {
 
 	public enum Target {
@@ -20,10 +22,12 @@ public class RenderTarget {
 		this.target = target;
 	}
 
-	public void attach(){
+	public void attach(int i, IntBuffer buffer){
 		switch (target){
 		case COLOR:
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, sampler.getID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, sampler.getID(), 0);
+			if (buffer != null)
+				buffer.put(GL_COLOR_ATTACHMENT0 + i);
 			break;
 		case DEPTH:
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, sampler.getID(), 0);
@@ -31,8 +35,16 @@ public class RenderTarget {
 
 	}
 
+	public void attach(){
+		attach(0, null);
+	}
+
 	public SamplerMap getSampler(){
 		return sampler;
+	}
+
+	public Target getTarget(){
+		return target;
 	}
 
 }

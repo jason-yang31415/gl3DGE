@@ -42,6 +42,7 @@ import render.shader.nodes.MathSN.Operation;
 import render.shader.nodes.MixSN;
 import render.shader.nodes.MixSN.Blend;
 import render.shader.nodes.NodeBasedShader;
+import render.shader.nodes.OutputSN;
 import render.shader.nodes.PositionSNV;
 import render.shader.nodes.RGBChannelSN;
 import render.shader.nodes.RGBChannelSN.Channel;
@@ -212,7 +213,7 @@ public class MainScreen extends Screen {
 		loop.setInValue(shading.getOutValue());
 		loop.getOutValue().defineAsVector3f();
 
-		nbs.getOutputNode().setInColor(loop.getOutValue());
+		nbs.getOutputNode().setInColor(loop.getOutValue(), OutputSN.DEFAULT_OUTPUT);
 
 		try {
 			nbs.loadShaders();
