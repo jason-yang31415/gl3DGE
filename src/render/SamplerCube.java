@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.lwjgl.opengl.GL21;
+
 import io.ImageLoader;
 
 public class SamplerCube extends SamplerMap {
@@ -31,7 +33,7 @@ public class SamplerCube extends SamplerMap {
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, wrap);
 		unbind();
 	}
-	
+
 	@Override
 	public void setTextureFilter(int filter){
 		bind();
@@ -39,22 +41,26 @@ public class SamplerCube extends SamplerMap {
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, filter);
 		unbind();
 	}
-	
+
 	@Override
 	public void bind(){
 		bindActiveTexture();
 		glBindTexture(GL_TEXTURE_CUBE_MAP, id);
 		//unbindActiveTexture();
 	}
-	
+
 	@Override
 	public void unbind(){
 		bindActiveTexture();
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		//unbindActiveTexture();
 	}
-	
+
 	public static SamplerCube load(String[] paths, int location){
+		return load(paths, location, false);
+	}
+
+	public static SamplerCube load(String[] paths, int location, boolean srgb){
 		ByteBuffer[] buffers = new ByteBuffer[6];
 		int width = 0;
 		int height = 0;
@@ -71,15 +77,15 @@ public class SamplerCube extends SamplerMap {
 				}
 			}
 		}
-		
+
 		SamplerCube samplerCube = new SamplerCube(width, height, location);
-		
+
 		for (int i = 0; i < 6; i++){
 			ByteBuffer buffer = buffers[i];
-			samplerCube.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+			samplerCube.texImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, srgb ? GL21.GL_SRGB8_ALPHA8 : GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 		}
-		
+
 		return samplerCube;
 	}
-	
+
 }

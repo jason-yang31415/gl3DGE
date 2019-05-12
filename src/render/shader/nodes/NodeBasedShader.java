@@ -7,6 +7,7 @@ import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,8 +18,6 @@ import org.lwjgl.opengl.GL31;
 import io.FileLoader;
 import render.Drawable;
 import render.Light;
-import render.SamplerCube;
-import render.SamplerMap;
 import render.Scene;
 import render.VertexBufferObject;
 import render.mesh.Mesh;
@@ -41,8 +40,7 @@ public class NodeBasedShader extends ObjectShader {
 	InputSN in = new InputSN(this);
 	OutputSN out = new OutputSN(this);
 
-	ArrayList<SamplerMap> samplers = new ArrayList<SamplerMap>();
-	ArrayList<SamplerCube> samplerCubes = new ArrayList<SamplerCube>();
+	Map<String, String> samplerSlots = new HashMap<String, String>();
 
 	int currentId = 0;
 
@@ -196,12 +194,9 @@ public class NodeBasedShader extends ObjectShader {
 		constants.add(value);
 	}
 
-	public void addSampler(SamplerMap sampler){
-		samplers.add(sampler);
-	}
-
-	public void addSamplerCube(SamplerCube samplerCube){
-		samplerCubes.add(samplerCube);
+	public void addSamplerSlot(String slot, SamplerSNV snv){
+		samplerSlots.put(slot, snv.getName());
+		uniforms.put(slot, snv);
 	}
 
 	public void addFunction(String function){
@@ -218,6 +213,10 @@ public class NodeBasedShader extends ObjectShader {
 
 	public Map<String, ShaderNodeValue> getUniforms(){
 		return uniforms;
+	}
+
+	public Map<String, String> getSamplerSlots(){
+		return samplerSlots;
 	}
 
 	public ArrayList<Structure> getStructures(){
@@ -245,12 +244,6 @@ public class NodeBasedShader extends ObjectShader {
 		shader.link();
 		shader.bind();
 
-		for (ShaderNodeValue snv : uniforms.values()){
-			if (snv instanceof SamplerSNV)
-				shader.setUniform1i(snv.getName(), ((SamplerSNV) snv).getSampler().getLocation());
-			else if (snv instanceof SamplerCubeSNV)
-				shader.setUniform1i(snv.getName(), ((SamplerCubeSNV) snv).getSamplerCube().getLocation());
-		}
 		if (ubo != null)
 			shader.uniformBlockBinding(ubo.getName(), ubo.getUBO());
 		shader.unbind();
@@ -354,18 +347,10 @@ public class NodeBasedShader extends ObjectShader {
 	@Override
 	public void bind(){
 		shader.bind();
-		for (SamplerMap sm : samplers)
-			sm.bind();
-		for (SamplerCube sc : samplerCubes)
-			sc.bind();
 	}
 
 	@Override
 	public void unbind(){
-		for (SamplerMap sm : samplers)
-			sm.unbind();
-		for (SamplerCube sc : samplerCubes)
-			sc.unbind();
 		shader.unbind();
 	}
 

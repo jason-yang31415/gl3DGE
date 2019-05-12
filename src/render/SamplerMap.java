@@ -22,6 +22,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.lwjgl.opengl.GL21;
+
 import io.ImageLoader;
 
 public class SamplerMap {
@@ -32,7 +34,7 @@ public class SamplerMap {
 	public static int EMISSION_DEFAULT = 3;
 
 	public final int id;
-	public final int location;
+	public int location;
 
 	private int width, height;
 
@@ -109,6 +111,10 @@ public class SamplerMap {
 		return height;
 	}
 
+	public void setLocation(int location) {
+		this.location = location;
+	}
+
 	public int getLocation(){
 		return location;
 	}
@@ -121,7 +127,11 @@ public class SamplerMap {
 		return id;
 	}
 
-	public static SamplerMap load(String path, int location){
+	public static SamplerMap load(String path, int location) {
+		return load(path, location, false);
+	}
+
+	public static SamplerMap load(String path, int location, boolean srgb){
 		BufferedImage image = null;
 		try {
 			image = ImageLoader.loadImage(path);
@@ -140,7 +150,7 @@ public class SamplerMap {
 
 		SamplerMap samplerMap = new SamplerMap(width, height, location);
 
-		samplerMap.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+		samplerMap.texImage2D(GL_TEXTURE_2D, 0, srgb ? GL21.GL_SRGB8_ALPHA8 : GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
 		return samplerMap;
 	}

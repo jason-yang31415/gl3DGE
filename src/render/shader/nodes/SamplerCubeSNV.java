@@ -2,25 +2,15 @@ package render.shader.nodes;
 
 import render.SamplerCube;
 
-public class SamplerCubeSNV extends ShaderNodeValue {
+public class SamplerCubeSNV extends SamplerSNV {
 
-	SamplerCube samplerCube;
-	
 	public SamplerCubeSNV(ShaderNode parent, String name) {
 		super(parent, name);
 	}
-	
+
 	public SamplerCubeSNV(ShaderNode parent, String name, SamplerCube samplerCube){
 		super(parent, name);
-		setSamplerCube(samplerCube);
-	}
-	
-	public void setSamplerCube(SamplerCube samplerCube){
-		this.samplerCube = samplerCube;
-	}
-	
-	public SamplerCube getSamplerCube(){
-		return samplerCube;
+		setSampler(samplerCube);
 	}
 
 	@Override
@@ -52,5 +42,5 @@ public class SamplerCubeSNV extends ShaderNodeValue {
 	public int getSTD140Alignment() {
 		return 0;
 	}
-	
+
 }

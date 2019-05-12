@@ -64,19 +64,18 @@ public class TrueTypeFont {
 		ts.addInput(ShaderNodeValue.INPUT_TEXTURE_COORDINATE, ts
 				.getInputNode().getOutTextureCoordinate());
 
-		ts.addSampler(getTexture());
 
-		SamplerSN texSampler2 = new SamplerSN(ts);
-		SamplerSNV texSNV2 = new SamplerSNV(null, "texture");
-		texSNV2.setSampler(getTexture());
-		ts.addUniform("texture", texSNV2);
-		texSampler2.setInSampler(texSNV2);
-		texSampler2.setInTextureCoordinate(ts.getInputNode()
+		SamplerSNV texSNV = new SamplerSNV(null, "texture");
+		ts.addSamplerSlot("tex", texSNV);
+
+		SamplerSN texSampler = new SamplerSN(ts);
+		texSampler.setInSampler(texSNV);
+		texSampler.setInTextureCoordinate(ts.getInputNode()
 				.getOutTextureCoordinate());
-		ts.addNode(texSampler2);
+		ts.addNode(texSampler);
 
 		AlphaTestSN at = new AlphaTestSN(ts);
-		at.setInValue(texSampler2.getOutAlpha());
+		at.setInValue(texSampler.getOutAlpha());
 		ts.addNode(at);
 
 		ValueSNV color = new ValueSNV(null, "color");
