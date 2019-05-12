@@ -22,7 +22,6 @@ import org.lwjgl.opengl.GL;
 import audio.AudioEngine;
 import display.Window;
 import game.Screen;
-import render.mesh.Resource;
 
 public class LightingDemo {
 
@@ -85,11 +84,6 @@ public class LightingDemo {
 		w.setCursorPos((double) WIDTH / 2, (double) HEIGHT / 2);
 
 		AudioEngine.initAudioEngine();
-
-		Resource.setGameObjectDir("/mesh/");
-		Resource.setOBJDir("/obj/");
-		Resource.setTexDir("/tex/");
-		Resource.setShaderDir("/shaders/");
 	}
 
 	public void loop(){
